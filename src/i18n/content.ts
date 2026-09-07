@@ -1,17 +1,14 @@
 /**
- * Translations for the reading content of the "Children of the Lance"
- * subsection: PT-PT (default), EN and ES.
+ * All translatable text for the site: PT-PT (default), EN and ES.
  *
- * SCOPE
- * -----
- * This covers the *prose* only: hero hook, page paragraphs, button labels and
- * character role lines + bios. The navbar labels and the on-page section
- * headings are intentionally left as they are in the components. The legal
- * disclaimer (COTL_DISCLAIMER in data/site.ts) stays in Portuguese in every
- * language, on purpose.
+ * Covers navbar labels, page eyebrows and headings, body prose, button
+ * labels, and character role lines + bios. Add a language by adding a full
+ * object below and listing it in COTL_LOCALES + COTL_CONTENT.
  *
- * This is a self-contained mini-i18n. It does NOT touch the site-wide i18n
- * system in src/i18n.
+ * Two things stay fixed in every language, on purpose:
+ *  - the work title "Children of the Lance" and the tagline
+ *    "Children versus Legacy" (see data/site.ts)
+ *  - the legal disclaimer COTL_DISCLAIMER (Portuguese, see data/site.ts)
  */
 
 export type CotlLocale = "pt" | "en" | "es";
@@ -26,27 +23,58 @@ export const COTL_LOCALE_STORAGE_KEY = "cotl-locale";
 export type CotlCopy = {
   /** aria-label for the language switcher. */
   switchLabel: string;
+  /** Navbar link labels, keyed by the `key` in COTL_NAV (data/site.ts). */
+  nav: {
+    home: string;
+    historia: string;
+    personagens: string;
+    conflito: string;
+    ler: string;
+    creditos: string;
+  };
+  /** Mobile menu toggle button. */
+  menu: { open: string; close: string };
   hero: { hook: string; ctaRead: string; ctaAbout: string };
-  personagens: { lead: string };
+  personagens: {
+    eyebrow: string;
+    h1: string;
+    lead: string;
+    h2Heroes: string;
+    h2Supporting: string;
+    h2Villains: string;
+  };
   historia: {
+    eyebrow: string;
+    h1: string;
     /** Sentence before the italic "Children versus Legacy." on the lead line. */
     leadIntro: string;
+    h2Before: string;
     before: [string, string];
+    h2Premise: string;
     premise: [string, string];
+    h2World: string;
     world: [string, string];
     ctaMeet: string;
   };
   conflito: {
+    eyebrow: string;
+    h1: string;
     lead: string;
+    h2Search: string;
     silverChild: string;
+    h2Knights: string;
     knights: [string, string];
+    h2Legacy: string;
     /** Sentence before the italic "Children versus Legacy." tagline. */
     legacy: string;
+    h2Where: string;
     whereIntro: string;
     /** Last location chip; the first three are proper nouns left untranslated. */
     ruinsOfNeraka: string;
   };
   ler: {
+    eyebrow: string;
+    h1: string;
     lead: string;
     comingSoon: string;
     openStory: string;
@@ -54,22 +82,40 @@ export type CotlCopy = {
     placeholder: string;
   };
   creditos: {
+    eyebrow: string;
+    h1: string;
+    h2Unofficial: string;
     unofficial: string;
+    h2Disclaimer: string;
+    h2Credits: string;
     artworkNote: string;
     /** Inline label in the credit list: "<name> — <artworkLabel> <artist>". */
     artworkLabel: string;
     /** Label under an image on the Characters page: "<artworkBeside>: <artist>". */
     artworkBeside: string;
     noArt: string;
-    placeholders: [string, string, string];
+    h2InProgress: string;
+    /** Low-key note that portraits / credits are still being added. */
+    inProgress: string;
+    h2Trademarks: string;
     trademarks: string;
   };
+  notFound: { h1: string; lead: string; cta: string };
   /** Keyed by character id (see data/characters.ts). */
   characters: Record<string, { role: string; bio: string[] }>;
 };
 
 const pt: CotlCopy = {
   switchLabel: "Idioma",
+  nav: {
+    home: "Início",
+    historia: "A História",
+    personagens: "Personagens",
+    conflito: "O Conflito",
+    ler: "Ler a História",
+    creditos: "Créditos",
+  },
+  menu: { open: "Menu", close: "Fechar" },
   hero: {
     hook:
       "Trinta anos depois de os Heróis da Lança terem banido Takhisis, o " +
@@ -81,16 +127,24 @@ const pt: CotlCopy = {
     ctaAbout: "Sobre a História",
   },
   personagens: {
+    eyebrow: "Personagens",
+    h1: "Personagens",
     lead:
       "Os herdeiros que respondem ao chamamento de Palin Majere, e os " +
       "Cavaleiros de Takhisis que cavalgam contra eles.",
+    h2Heroes: "Os Filhos da Lança",
+    h2Supporting: "Personagens Secundárias",
+    h2Villains: "Os Vilões",
   },
   historia: {
+    eyebrow: "A História",
+    h1: "Sobre a História",
     leadIntro:
       "Children of the Lance é uma continuação não oficial, feita por fãs, da " +
       "trilogia Dragonlance Chronicles (1984). Passa-se no mundo de Krynn, no " +
       "continente de Ansalon, dentro do universo Dragonlance. O seu resumo em " +
       "três palavras:",
+    h2Before: "O que veio antes",
     before: [
       "Antes de Children of the Lance, Krynn era um mundo sem esperança. Os " +
         "deuses tinham voltado o rosto, e os Exércitos do Dragão da Rainha das " +
@@ -102,6 +156,7 @@ const pt: CotlCopy = {
         "Takhisis foi detida à porta do mundo mortal e atirada de novo para o " +
         "Abismo.",
     ],
+    h2Premise: "A premissa",
     premise: [
       "Passaram trinta anos dessa paz difícil. Agora o Império do Dragão " +
         "ergue-se no seu lugar, e os seus oito Cavaleiros do Dragão, cada um " +
@@ -113,6 +168,7 @@ const pt: CotlCopy = {
         "hipótese de deter o Império, têm primeiro de se encontrar e depois " +
         "decidir se seguem a estrada que os pais seguiram ou se abrem uma nova.",
     ],
+    h2World: "O mundo: Krynn e Ansalon",
     world: [
       "Krynn é um mundo de deuses e dragões, onde Takhisis e Paladine estão em " +
         "lados opostos de todas as guerras, e onde kenders, minotauros, elfos, " +
@@ -126,16 +182,20 @@ const pt: CotlCopy = {
     ctaMeet: "Conhecer as Personagens",
   },
   conflito: {
+    eyebrow: "O Conflito",
+    h1: "O Conflito",
     lead:
       "Tudo gira em torno da Criança de Prata, nascida de um dragão e de um " +
       "mortal. Os dois lados perseguem a criança por toda a Ansalon, e só um " +
       "deles pode chegar primeiro.",
+    h2Search: "A busca da Criança de Prata",
     silverChild:
       "Os Oito Cavaleiros de Takhisis precisam da Criança de Prata para a obra " +
       "sombria de trazer a sua Rainha de volta, e gastarão exércitos para a " +
       "encontrar. Os Filhos da Lança têm de chegar primeiro à criança e " +
       "mantê-la fora do alcance do Império, antes que a porta do Abismo seja " +
       "forçada uma segunda vez.",
+    h2Knights: "Os Oito Cavaleiros de Takhisis",
     knights: [
       "Oito Cavaleiros do Dragão comandam o Império do Dragão, cada um ligado a " +
         "um dragão poderoso. Respondem a Ariakan Ariakas, o Cavaleiro do Dragão " +
@@ -146,36 +206,44 @@ const pt: CotlCopy = {
         "da Rosa Negra, cavalga com os Oito como uma lenda que regressou, aliado " +
         "à causa deles ou a inclinando em silêncio para fins próprios.",
     ],
+    h2Legacy: "Children versus Legacy",
     legacy:
       "Por baixo da perseguição, esta é uma história sobre herança. Cada um dos " +
       "Filhos nasceu dentro de um legado: um nome célebre, uma velha profecia, a " +
       "guerra inacabada de um pai ou de uma mãe. A pergunta que o livro não " +
       "larga é se estão presos a seguir o caminho que lhes foi traçado ou " +
       "livres para forjar algo novo.",
+    h2Where: "Onde se desenrola",
     whereIntro:
       "A caça atravessa Ansalon por lugares que a trilogia Chronicles original " +
       "tornou famosos, todos eles mudados nos trinta anos que passaram:",
     ruinsOfNeraka: "As ruínas de Neraka",
   },
   ler: {
+    eyebrow: "Ler a História",
+    h1: "Ler a História",
     lead:
       "Children of the Lance vai ser publicada online como obra de fã. O link " +
       "de leitura fica aqui.",
     comingSoon: "Link de leitura em breve",
     openStory: "Abrir a história",
     activateNote:
-      "Para ativar este botão, define COTL_READ_URL em " +
-      "src/children-of-the-lance/data/site.ts com o teu link do AO3 ou do " +
-      "Wattpad.",
+      "Para ativar este botão, define COTL_READ_URL em src/data/site.ts com o " +
+      "teu link do AO3 ou do Wattpad.",
     placeholder:
       "Página provisória — substitui este texto quando a história estiver " +
       "publicada.",
   },
   creditos: {
+    eyebrow: "Créditos e Aviso Legal",
+    h1: "Créditos e Aviso Legal",
+    h2Unofficial: "Obra de fã não oficial",
     unofficial:
       "Children of the Lance é uma continuação sem fins comerciais, feita por " +
       "fãs, das Dragonlance Chronicles. É feita por fãs, para fãs, e não gera " +
       "qualquer dinheiro. Não é um produto oficial de Dragonlance.",
+    h2Disclaimer: "Aviso legal",
+    h2Credits: "Créditos de ilustração",
     artworkNote:
       "Qualquer ilustração oficial de Dragonlance usada neste site é creditada " +
       "ao artista original mesmo ao lado da imagem, e de novo na lista abaixo.",
@@ -185,15 +253,20 @@ const pt: CotlCopy = {
       "Ainda não há ilustrações de terceiros creditadas. Acrescenta o nome do " +
       "artista a cada entrada em data/characters.ts e ele aparece aqui e ao " +
       "lado da imagem na página de Personagens.",
-    placeholders: [
-      "Logótipo oficial de Dragonlance — adicionar o ficheiro e a sua origem.",
-      "Retrato de Lord Soth — substituir o marcador do artista por um crédito real.",
-      "Qualquer outra ilustração oficial usada no site — creditar aqui e ao lado da imagem.",
-    ],
+    h2InProgress: "Em construção",
+    inProgress:
+      "Alguns retratos de personagens e créditos de ilustração ainda estão a " +
+      "ser adicionados.",
+    h2Trademarks: "Marcas registadas",
     trademarks:
       "Dragonlance, as suas personagens, lugares e propriedades relacionadas " +
       "são marcas registadas da Wizards of the Coast. Não se pretende contestar " +
       "essa titularidade.",
+  },
+  notFound: {
+    h1: "Esta página perdeu-se em Ansalon",
+    lead: "O caminho que seguiste não leva a lado nenhum.",
+    cta: "Voltar ao início",
   },
   characters: {
     "palin-majere": {
@@ -312,6 +385,15 @@ const pt: CotlCopy = {
 
 const en: CotlCopy = {
   switchLabel: "Language",
+  nav: {
+    home: "Home",
+    historia: "The Story",
+    personagens: "Characters",
+    conflito: "The Conflict",
+    ler: "Read the Story",
+    creditos: "Credits",
+  },
+  menu: { open: "Menu", close: "Close" },
   hero: {
     hook:
       "Thirty years after the Heroes of the Lance banished Takhisis, the Dragon " +
@@ -322,16 +404,24 @@ const en: CotlCopy = {
     ctaAbout: "About the Story",
   },
   personagens: {
+    eyebrow: "Characters",
+    h1: "Characters",
     lead:
       "The heirs who answer Palin Majere's call, and the Knights of Takhisis " +
       "who ride against them.",
+    h2Heroes: "The Children of the Lance",
+    h2Supporting: "Supporting Characters",
+    h2Villains: "The Villains",
   },
   historia: {
+    eyebrow: "The Story",
+    h1: "About the Story",
     leadIntro:
       "Children of the Lance is an unofficial fan continuation of the " +
       "Dragonlance Chronicles trilogy (1984). It unfolds on the world of Krynn, " +
       "on the continent of Ansalon, within the Dragonlance universe. Its " +
       "three-word summary:",
+    h2Before: "What happened before",
     before: [
       "Before Children of the Lance, Krynn was a world without hope. The gods " +
         "had turned their faces away, and the Dragonarmies of the Queen of " +
@@ -343,6 +433,7 @@ const en: CotlCopy = {
         "stopped at the threshold of the mortal world and cast back down into " +
         "the Abyss.",
     ],
+    h2Premise: "The premise",
     premise: [
       "Thirty years of that hard-won peace have passed. Now the Dragon Empire " +
         "rises in its place, and its eight Dragon Knights, each bound to a " +
@@ -354,6 +445,7 @@ const en: CotlCopy = {
         "another, and then decide whether to walk the road their parents walked " +
         "or cut a new one of their own.",
     ],
+    h2World: "The world: Krynn and Ansalon",
     world: [
       "Krynn is a world of gods and dragons, where Takhisis and Paladine stand " +
         "on opposite sides of every war, and where kender, minotaurs, elves, " +
@@ -367,16 +459,20 @@ const en: CotlCopy = {
     ctaMeet: "Meet the Characters",
   },
   conflito: {
+    eyebrow: "The Conflict",
+    h1: "The Conflict",
     lead:
       "Everything turns on the Silver Child, born of a dragon and a mortal. " +
       "Both sides are hunting the child across Ansalon, and only one of them " +
       "can be allowed to reach it first.",
+    h2Search: "The search for the Silver Child",
     silverChild:
       "The Eight Knights of Takhisis need the Silver Child for the dark work " +
       "of bringing their Queen home, and they will spend armies to find it. " +
       "The Children of the Lance have to reach the child first and keep it " +
       "beyond the Empire's grasp, before the door to the Abyss is forced open " +
       "a second time.",
+    h2Knights: "The Eight Knights of Takhisis",
     knights: [
       "Eight Dragon Knights lead the Dragon Empire, each bound to a powerful " +
         "dragon. They answer to Ariakan Ariakas, the Red Dragon Knight and son " +
@@ -387,34 +483,42 @@ const en: CotlCopy = {
         "Rose, rides with the Eight as a returning legend, allied with their " +
         "cause or quietly bending it toward ends of his own.",
     ],
+    h2Legacy: "Children versus Legacy",
     legacy:
       "Underneath the chase, this is a story about legacy. Every one of the " +
       "Children was born into an inheritance: a famous name, an old prophecy, " +
       "a parent's unfinished war. The question the book keeps asking is whether " +
       "they are bound to follow the path laid down for them, or free to forge " +
       "something new.",
+    h2Where: "Where it plays out",
     whereIntro:
       "The hunt crosses Ansalon through places the original Chronicles trilogy " +
       "made famous, all of them changed in the thirty years since:",
     ruinsOfNeraka: "The ruins of Neraka",
   },
   ler: {
+    eyebrow: "Read the Story",
+    h1: "Read the Story",
     lead:
       "Children of the Lance will be published online as a fan work. The " +
       "reading link goes here.",
     comingSoon: "Reading link coming soon",
     openStory: "Open the story",
     activateNote:
-      "To activate this button, set COTL_READ_URL in " +
-      "src/children-of-the-lance/data/site.ts to your AO3 or Wattpad link.",
-    placeholder:
-      "Placeholder page — replace this copy once the story is live.",
+      "To activate this button, set COTL_READ_URL in src/data/site.ts to your " +
+      "AO3 or Wattpad link.",
+    placeholder: "Placeholder page — replace this copy once the story is live.",
   },
   creditos: {
+    eyebrow: "Credits & Disclaimer",
+    h1: "Credits & Disclaimer",
+    h2Unofficial: "Unofficial fan work",
     unofficial:
       "Children of the Lance is a non-commercial, fan-made continuation of the " +
       "Dragonlance Chronicles. It is made by fans, for fans, and earns no " +
       "money. It is not an official Dragonlance product.",
+    h2Disclaimer: "Legal disclaimer",
+    h2Credits: "Artwork credits",
     artworkNote:
       "Any official Dragonlance artwork used on this site is credited to its " +
       "original artist directly beside the image, and again in the list below.",
@@ -424,15 +528,19 @@ const en: CotlCopy = {
       "No borrowed artwork credited yet. Add the artist's name to each entry " +
       "in data/characters.ts and it appears here and beside the image on the " +
       "Characters page.",
-    placeholders: [
-      "Official Dragonlance logo — add the file and its source.",
-      "Lord Soth portrait — replace the artist placeholder with a real credit.",
-      "Any other official artwork used on the site — credit it here and next to the image.",
-    ],
+    h2InProgress: "Still in progress",
+    inProgress:
+      "Some character portraits and artwork credits are still being added.",
+    h2Trademarks: "Trademarks",
     trademarks:
       "Dragonlance, its characters, places and related properties are " +
       "trademarks of Wizards of the Coast. No challenge to their ownership is " +
       "intended.",
+  },
+  notFound: {
+    h1: "This page is lost somewhere in Ansalon",
+    lead: "The road you followed leads nowhere.",
+    cta: "Back to the start",
   },
   characters: {
     "palin-majere": {
@@ -549,6 +657,15 @@ const en: CotlCopy = {
 
 const es: CotlCopy = {
   switchLabel: "Idioma",
+  nav: {
+    home: "Inicio",
+    historia: "La Historia",
+    personagens: "Personajes",
+    conflito: "El Conflicto",
+    ler: "Leer la Historia",
+    creditos: "Créditos",
+  },
+  menu: { open: "Menú", close: "Cerrar" },
   hero: {
     hook:
       "Treinta años después de que los Héroes de la Lanza desterraran a " +
@@ -560,16 +677,24 @@ const es: CotlCopy = {
     ctaAbout: "Sobre la Historia",
   },
   personagens: {
+    eyebrow: "Personajes",
+    h1: "Personajes",
     lead:
       "Los herederos que responden a la llamada de Palin Majere, y los " +
       "Caballeros de Takhisis que cabalgan contra ellos.",
+    h2Heroes: "Los Hijos de la Lanza",
+    h2Supporting: "Personajes Secundarios",
+    h2Villains: "Los Villanos",
   },
   historia: {
+    eyebrow: "La Historia",
+    h1: "Sobre la Historia",
     leadIntro:
       "Children of the Lance es una continuación no oficial, hecha por " +
       "aficionados, de la trilogía Dragonlance Chronicles (1984). Transcurre " +
       "en el mundo de Krynn, en el continente de Ansalón, dentro del universo " +
       "Dragonlance. Su resumen en tres palabras:",
+    h2Before: "Lo que sucedió antes",
     before: [
       "Antes de Children of the Lance, Krynn era un mundo sin esperanza. Los " +
         "dioses habían vuelto el rostro, y los Ejércitos del Dragón de la Reina " +
@@ -582,6 +707,7 @@ const es: CotlCopy = {
         "camino terminó cuando Takhisis fue detenida en el umbral del mundo " +
         "mortal y arrojada de nuevo al Abismo.",
     ],
+    h2Premise: "La premisa",
     premise: [
       "Han pasado treinta años de esa paz difícil. Ahora el Imperio del Dragón " +
         "se alza en su lugar, y sus ocho Caballeros del Dragón, cada uno unido " +
@@ -594,6 +720,7 @@ const es: CotlCopy = {
         "luego decidir si recorren el camino que recorrieron sus padres o " +
         "abren uno nuevo.",
     ],
+    h2World: "El mundo: Krynn y Ansalón",
     world: [
       "Krynn es un mundo de dioses y dragones, donde Takhisis y Paladine están " +
         "en bandos opuestos de cada guerra, y donde kenders, minotauros, " +
@@ -607,16 +734,20 @@ const es: CotlCopy = {
     ctaMeet: "Conocer a los Personajes",
   },
   conflito: {
+    eyebrow: "El Conflicto",
+    h1: "El Conflicto",
     lead:
       "Todo gira en torno a la Criatura de Plata, nacida de un dragón y de un " +
       "mortal. Ambos bandos persiguen a la criatura por toda Ansalón, y solo " +
       "uno de ellos puede llegar primero.",
+    h2Search: "La búsqueda de la Criatura de Plata",
     silverChild:
       "Los Ocho Caballeros de Takhisis necesitan a la Criatura de Plata para " +
       "la obra oscura de traer de vuelta a su Reina, y gastarán ejércitos en " +
       "encontrarla. Los Hijos de la Lanza tienen que llegar antes a la " +
       "criatura y mantenerla fuera del alcance del Imperio, antes de que la " +
       "puerta del Abismo se fuerce por segunda vez.",
+    h2Knights: "Los Ocho Caballeros de Takhisis",
     knights: [
       "Ocho Caballeros del Dragón dirigen el Imperio del Dragón, cada uno " +
         "unido a un dragón poderoso. Responden ante Ariakan Ariakas, el " +
@@ -629,12 +760,14 @@ const es: CotlCopy = {
         "vuelto, aliado a su causa o inclinándola en silencio hacia fines " +
         "propios.",
     ],
+    h2Legacy: "Children versus Legacy",
     legacy:
       "Bajo la persecución, esta es una historia sobre el legado. Cada uno de " +
       "los Hijos nació dentro de una herencia: un nombre célebre, una vieja " +
       "profecía, la guerra inacabada de un padre o una madre. La pregunta que " +
       "el libro no suelta es si están atados a seguir el camino que se les " +
       "trazó o libres para forjar algo nuevo.",
+    h2Where: "Dónde transcurre",
     whereIntro:
       "La cacería atraviesa Ansalón por lugares que la trilogía Chronicles " +
       "original hizo famosos, todos ellos cambiados en los treinta años " +
@@ -642,24 +775,31 @@ const es: CotlCopy = {
     ruinsOfNeraka: "Las ruinas de Neraka",
   },
   ler: {
+    eyebrow: "Leer la Historia",
+    h1: "Leer la Historia",
     lead:
       "Children of the Lance se publicará en línea como obra de aficionados. " +
       "El enlace de lectura irá aquí.",
     comingSoon: "Enlace de lectura próximamente",
     openStory: "Abrir la historia",
     activateNote:
-      "Para activar este botón, define COTL_READ_URL en " +
-      "src/children-of-the-lance/data/site.ts con tu enlace de AO3 o Wattpad.",
+      "Para activar este botón, define COTL_READ_URL en src/data/site.ts con " +
+      "tu enlace de AO3 o Wattpad.",
     placeholder:
       "Página provisional — sustituye este texto cuando la historia esté " +
       "publicada.",
   },
   creditos: {
+    eyebrow: "Créditos y Aviso Legal",
+    h1: "Créditos y Aviso Legal",
+    h2Unofficial: "Obra de aficionados no oficial",
     unofficial:
       "Children of the Lance es una continuación sin fines comerciales, hecha " +
       "por aficionados, de las Dragonlance Chronicles. Está hecha por " +
       "aficionados, para aficionados, y no genera dinero alguno. No es un " +
       "producto oficial de Dragonlance.",
+    h2Disclaimer: "Aviso legal",
+    h2Credits: "Créditos de ilustración",
     artworkNote:
       "Cualquier ilustración oficial de Dragonlance usada en este sitio se " +
       "acredita a su artista original justo al lado de la imagen, y de nuevo " +
@@ -670,15 +810,20 @@ const es: CotlCopy = {
       "Todavía no hay ilustraciones de terceros acreditadas. Añade el nombre " +
       "del artista a cada entrada en data/characters.ts y aparecerá aquí y " +
       "junto a la imagen en la página de Personajes.",
-    placeholders: [
-      "Logotipo oficial de Dragonlance — añadir el archivo y su origen.",
-      "Retrato de Lord Soth — sustituir el marcador del artista por un crédito real.",
-      "Cualquier otra ilustración oficial usada en el sitio — acreditarla aquí y junto a la imagen.",
-    ],
+    h2InProgress: "En construcción",
+    inProgress:
+      "Algunos retratos de personajes y créditos de ilustración todavía se " +
+      "están añadiendo.",
+    h2Trademarks: "Marcas registradas",
     trademarks:
       "Dragonlance, sus personajes, lugares y propiedades relacionadas son " +
       "marcas registradas de Wizards of the Coast. No se pretende cuestionar " +
       "dicha titularidad.",
+  },
+  notFound: {
+    h1: "Esta página se ha perdido en Ansalón",
+    lead: "El camino que seguiste no lleva a ninguna parte.",
+    cta: "Volver al inicio",
   },
   characters: {
     "palin-majere": {

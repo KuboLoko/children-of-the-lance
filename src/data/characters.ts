@@ -88,4 +88,8 @@ export const VILLAINS: Character[] = [
 ];
 
 /** Every character in one list, in display order. */
-export const ALL_CHARACTERS: Character[] = [...HEROES, ...SUPPORTING, ...VILLAINS];
+export const ALL_CHARACTERS: Character[] = [
+  ...HEROES,
+  ...SUPPORTING,
+  ...VILLAINS,
+];

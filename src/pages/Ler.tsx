@@ -4,17 +4,18 @@ import { useDocumentMeta } from "../lib/useDocumentMeta";
 
 export function Ler() {
   const { t } = useCotl();
-  useDocumentMeta("Ler a História · Children of the Lance", t.ler.lead);
+  const c = t.ler;
+  useDocumentMeta(`${c.h1} · Children of the Lance`, c.lead);
 
   const hasLink = Boolean(COTL_READ_URL);
 
   return (
     <div className="cotl-container cotl-section">
-      <p className="cotl-eyebrow">Ler a História</p>
-      <h1>Read the Story</h1>
+      <p className="cotl-eyebrow">{c.eyebrow}</p>
+      <h1>{c.h1}</h1>
 
       <div className="cotl-prose">
-        <p className="cotl-lead">{t.ler.lead}</p>
+        <p className="cotl-lead">{c.lead}</p>
 
         {hasLink ? (
           <p>
@@ -24,21 +25,21 @@ export function Ler() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t.ler.openStory}
+              {c.openStory}
             </a>
           </p>
         ) : (
           <p>
             <span className="cotl-btn cotl-btn--primary" aria-disabled="true">
-              {t.ler.comingSoon}
+              {c.comingSoon}
             </span>
             <br />
-            <small>{t.ler.activateNote}</small>
+            <small>{c.activateNote}</small>
           </p>
         )}
 
         <p>
-          <em>{t.ler.placeholder}</em>
+          <em>{c.placeholder}</em>
         </p>
       </div>
     </div>

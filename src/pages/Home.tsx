@@ -10,7 +10,10 @@ export function Home() {
 
   return (
     <section className="cotl-hero cotl-container">
-      <Logo className="cotl-hero__logo" fallbackClassName="cotl-hero__logo-fallback" />
+      <Logo
+        className="cotl-hero__logo"
+        fallbackClassName="cotl-hero__logo-fallback"
+      />
 
       <h1>{COTL_TITLE}</h1>
       <p className="cotl-hero__tagline">{COTL_TAGLINE}</p>

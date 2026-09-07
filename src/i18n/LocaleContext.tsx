@@ -64,7 +64,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     [locale],
   );
 
-  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
+  return (
+    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
+  );
 }
 
 /** Read the active locale, the setter, and the current content slice. */

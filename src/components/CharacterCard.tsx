@@ -22,7 +22,11 @@ export function CharacterCard({
     <article className="cotl-card">
       <figure className="cotl-portrait">
         {character.image ? (
-          <img src={character.image} alt={`${character.name} — ${role}`} loading="lazy" />
+          <img
+            src={character.image}
+            alt={`${character.name} — ${role}`}
+            loading="lazy"
+          />
         ) : (
           <div className="cotl-portrait__placeholder">
             Add portrait

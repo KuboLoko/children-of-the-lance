@@ -6,6 +6,8 @@
  * too; this file only holds structural data (see src/data/characters.ts).
  */
 
+import type { CotlCopy } from "../i18n/content";
+
 /** Official Dragonlance logo. Drop the file here with this exact name. */
 export const COTL_LOGO = "/images/logo/dragonlance-logo.png";
 
@@ -24,17 +26,17 @@ export const COTL_DISCLAIMER =
   "propriedades relacionadas são marcas registadas da Wizards of the Coast.";
 
 /**
- * Navbar links. `label` is intentionally kept in Portuguese regardless of the
- * chosen reading language; `to` values are the root-level routes.
+ * Navbar links. `key` maps to the label in src/i18n/content.ts `nav`, so the
+ * navbar follows the chosen language. `to` values are the root-level routes.
  */
-export const COTL_NAV: { label: string; to: string }[] = [
-  { label: "Início", to: "/" },
-  { label: "A História", to: "/historia" },
-  { label: "Personagens", to: "/personagens" },
-  { label: "O Conflito", to: "/conflito" },
-  { label: "Ler a História", to: "/ler" },
-  { label: "Créditos", to: "/creditos" },
-];
+export const COTL_NAV = [
+  { key: "home", to: "/" },
+  { key: "historia", to: "/historia" },
+  { key: "personagens", to: "/personagens" },
+  { key: "conflito", to: "/conflito" },
+  { key: "ler", to: "/ler" },
+  { key: "creditos", to: "/creditos" },
+] as const satisfies { key: keyof CotlCopy["nav"]; to: string }[];
 
 /**
  * Placeholder for the real reading link (AO3, Wattpad, etc.).

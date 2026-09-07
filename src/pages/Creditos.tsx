@@ -5,48 +5,45 @@ import { useDocumentMeta } from "../lib/useDocumentMeta";
 
 export function Creditos() {
   const { t } = useCotl();
-  useDocumentMeta("Créditos e Aviso Legal · Children of the Lance", t.creditos.unofficial);
+  const c = t.creditos;
+  useDocumentMeta(`${c.h1} · Children of the Lance`, c.unofficial);
 
   // Only characters whose art is borrowed need a credit line here.
-  const credited = ALL_CHARACTERS.filter((c) => c.image && c.artist);
+  const credited = ALL_CHARACTERS.filter((ch) => ch.image && ch.artist);
 
   return (
     <div className="cotl-container cotl-section">
-      <p className="cotl-eyebrow">Créditos e Aviso Legal</p>
-      <h1>Credits &amp; Disclaimer</h1>
+      <p className="cotl-eyebrow">{c.eyebrow}</p>
+      <h1>{c.h1}</h1>
 
       <div className="cotl-prose">
-        <h2>Unofficial fan work</h2>
-        <p>{t.creditos.unofficial}</p>
+        <h2>{c.h2Unofficial}</h2>
+        <p>{c.unofficial}</p>
 
-        <h2>Legal disclaimer</h2>
+        <h2>{c.h2Disclaimer}</h2>
         <p>{COTL_DISCLAIMER}</p>
 
-        <h2>Artwork credits</h2>
-        <p>{t.creditos.artworkNote}</p>
+        <h2>{c.h2Credits}</h2>
+        <p>{c.artworkNote}</p>
         {credited.length > 0 ? (
           <ul className="cotl-list">
-            {credited.map((c) => (
-              <li key={c.id}>
-                <strong>{c.name}</strong> — {t.creditos.artworkLabel} {c.artist}
+            {credited.map((ch) => (
+              <li key={ch.id}>
+                <strong>{ch.name}</strong> — {c.artworkLabel} {ch.artist}
               </li>
             ))}
           </ul>
         ) : (
           <p>
-            <em>{t.creditos.noArt}</em>
+            <em>{c.noArt}</em>
           </p>
         )}
 
-        <h2>Placeholders to fill in</h2>
-        <ul className="cotl-list">
-          {t.creditos.placeholders.map((item, i) => (
-            <li key={i}>{item}</li>
-          ))}
-        </ul>
+        <h2>{c.h2InProgress}</h2>
+        <p>{c.inProgress}</p>
 
-        <h2>Trademarks</h2>
-        <p>{t.creditos.trademarks}</p>
+        <h2>{c.h2Trademarks}</h2>
+        <p>{c.trademarks}</p>
       </div>
     </div>
   );
