@@ -55,7 +55,11 @@ body {
   background-color: var(--cotl-bg);
   /* Subtle vignette. Scrolls with the page (no fixed layer) to avoid
      compositor repaint glitches on long pages. */
-  background-image: radial-gradient(70% 30% at 50% 0%, rgba(129, 99, 255, 0.12), transparent 70%);
+  background-image: radial-gradient(
+    70% 30% at 50% 0%,
+    rgba(129, 99, 255, 0.12),
+    transparent 70%
+  );
   background-repeat: no-repeat;
   color: var(--cotl-text);
   font-family: var(--cotl-body);
@@ -132,7 +136,12 @@ a:hover {
 .cotl-divider {
   border: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--cotl-border), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--cotl-border),
+    transparent
+  );
   margin: 3rem 0;
 }
 
@@ -311,7 +320,11 @@ a:hover {
 }
 
 .cotl-btn--primary {
-  background: linear-gradient(135deg, var(--cotl-primary), var(--cotl-primary-deep));
+  background: linear-gradient(
+    135deg,
+    var(--cotl-primary),
+    var(--cotl-primary-deep)
+  );
   color: #fff;
   box-shadow: 0 10px 30px -12px rgba(129, 99, 255, 0.7);
 }
@@ -325,6 +338,9 @@ a:hover {
 .cotl-btn:hover {
   transform: translateY(-2px);
   text-decoration: none;
+}
+.cotl-btn:active {
+  transform: scale(0.97);
 }
 .cotl-btn[aria-disabled="true"] {
   opacity: 0.55;
@@ -375,7 +391,11 @@ a:hover {
 .cotl-hero__orb--a {
   width: 44vmax;
   height: 44vmax;
-  background: radial-gradient(circle, rgba(129, 99, 255, 0.22), transparent 62%);
+  background: radial-gradient(
+    circle,
+    rgba(129, 99, 255, 0.22),
+    transparent 62%
+  );
 }
 
 .cotl-hero__orb--b {
