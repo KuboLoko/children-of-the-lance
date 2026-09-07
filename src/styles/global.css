@@ -1,0 +1,541 @@
+/*
+ * Global styles for the Children of the Lance fan site.
+ *
+ * This is a standalone app, so these styles are global on purpose. The theme
+ * is a single dark palette (deep blue / arcane purple with dragon-ember and
+ * red accents). To retheme the whole site, edit the CSS variables in :root.
+ *
+ * Component class names keep the `cotl-` prefix as a simple namespace.
+ */
+
+:root {
+  /* Palette */
+  --cotl-bg: #0c0e1e;
+  --cotl-bg-2: #141733;
+  --cotl-surface: #1c1f42;
+  --cotl-surface-2: #262a54;
+  --cotl-border: #2c2f5c;
+  --cotl-border-soft: #23264c;
+
+  --cotl-text: #e9e8f5;
+  --cotl-muted: #a7a5c8;
+  --cotl-faint: #7d7ba3;
+
+  --cotl-primary: #8163ff; /* arcane purple */
+  --cotl-primary-deep: #4a37ac;
+  --cotl-ember: #e9a441; /* dragon gold / torchlight */
+  --cotl-red: #d1402a; /* red dragon */
+  --cotl-silver: #cdd6ea; /* the Silver Child */
+
+  --cotl-display: "Cinzel", "Space Grotesk", Georgia, serif;
+  --cotl-body: "EB Garamond", Georgia, "Times New Roman", serif;
+
+  --cotl-maxw: 1080px;
+  --cotl-radius: 10px;
+  --cotl-shadow: 0 18px 50px -20px rgba(0, 0, 0, 0.7);
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--cotl-bg);
+  /* Subtle vignette. Scrolls with the page (no fixed layer) to avoid
+     compositor repaint glitches on long pages. */
+  background-image: radial-gradient(70% 30% at 50% 0%, rgba(129, 99, 255, 0.12), transparent 70%);
+  background-repeat: no-repeat;
+  color: var(--cotl-text);
+  font-family: var(--cotl-body);
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* ---- Typography ---------------------------------------------------------- */
+
+h1,
+h2,
+h3 {
+  font-family: var(--cotl-display);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: #fff;
+  margin: 0 0 0.5em;
+}
+
+h1 {
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+}
+h2 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+}
+h3 {
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+}
+
+p {
+  margin: 0 0 1rem;
+}
+a {
+  color: var(--cotl-ember);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.cotl-eyebrow {
+  font-family: var(--cotl-display);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 0.78rem;
+  color: var(--cotl-ember);
+  margin: 0 0 1rem;
+}
+
+.cotl-lead {
+  font-size: 1.25rem;
+  color: var(--cotl-muted);
+  max-width: 60ch;
+}
+
+/* ---- Layout helpers ---------------------------------------------------- */
+
+.cotl-container {
+  width: 100%;
+  max-width: var(--cotl-maxw);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.cotl-section {
+  padding: 4rem 0;
+}
+
+.cotl-divider {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cotl-border), transparent);
+  margin: 3rem 0;
+}
+
+/* ---- Navbar ---------------------------------------------------------------- */
+
+.cotl-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(9, 10, 20, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--cotl-border-soft);
+}
+
+.cotl-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 64px;
+}
+
+.cotl-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--cotl-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.cotl-nav__brand:hover {
+  text-decoration: none;
+}
+
+@media (max-width: 520px) {
+  .cotl-nav__brand {
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+  }
+}
+
+.cotl-nav__logo {
+  height: 34px;
+  width: auto;
+  display: block;
+}
+/* Before the logo file exists, just show the wordmark span, not a second label. */
+.cotl-nav__logo-text {
+  display: none;
+}
+
+.cotl-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cotl-nav__links a {
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--cotl-muted);
+  font-family: var(--cotl-display);
+  letter-spacing: 0.03em;
+}
+
+.cotl-nav__links a:hover {
+  color: #fff;
+  background: var(--cotl-surface);
+  text-decoration: none;
+}
+.cotl-nav__links a.is-active {
+  color: #fff;
+  background: var(--cotl-primary-deep);
+}
+
+.cotl-nav__lang-item {
+  display: flex;
+  align-items: center;
+  margin-left: 0.4rem;
+}
+
+.cotl-nav__toggle {
+  display: none;
+  background: var(--cotl-surface);
+  border: 1px solid var(--cotl-border);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+@media (max-width: 860px) {
+  .cotl-nav__toggle {
+    display: inline-block;
+  }
+  .cotl-nav__links {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0.5rem 1rem 1rem;
+    background: var(--cotl-bg-2);
+    border-bottom: 1px solid var(--cotl-border);
+  }
+  .cotl-nav__links.is-open {
+    display: flex;
+  }
+  .cotl-nav__links a {
+    padding: 0.75rem 0.5rem;
+    font-size: 1rem;
+  }
+  .cotl-nav__lang-item {
+    margin-left: 0;
+    padding: 0.75rem 0.5rem 0.25rem;
+  }
+}
+
+/* ---- Language switcher ------------------------------------------------- */
+
+.cotl-lang {
+  display: inline-flex;
+  border: 1px solid var(--cotl-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.cotl-lang button {
+  border: 0;
+  background: transparent;
+  color: var(--cotl-muted);
+  font-family: var(--cotl-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
+.cotl-lang button:hover {
+  color: #fff;
+}
+
+.cotl-lang button.is-active {
+  background: var(--cotl-primary-deep);
+  color: #fff;
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+
+.cotl-btn {
+  display: inline-block;
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--cotl-radius);
+  font-family: var(--cotl-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.cotl-btn--primary {
+  background: linear-gradient(135deg, var(--cotl-primary), var(--cotl-primary-deep));
+  color: #fff;
+  box-shadow: 0 10px 30px -12px rgba(129, 99, 255, 0.7);
+}
+
+.cotl-btn--ghost {
+  background: transparent;
+  border-color: var(--cotl-border);
+  color: var(--cotl-text);
+}
+
+.cotl-btn:hover {
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+.cotl-btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ---- Hero ------------------------------------------------------------------ */
+
+.cotl-hero {
+  text-align: center;
+  padding: 5rem 0 4rem;
+}
+
+.cotl-hero__logo {
+  max-width: 460px;
+  width: 70%;
+  margin: 0 auto 2rem;
+  display: block;
+}
+
+.cotl-hero__logo-fallback {
+  display: block;
+  font-family: var(--cotl-display);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--cotl-silver);
+  padding: 0.5rem 1.25rem;
+  margin: 0 auto 2rem;
+}
+
+.cotl-hero__tagline {
+  font-family: var(--cotl-display);
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  color: var(--cotl-ember);
+  font-size: 1rem;
+  margin: 0 0 1.5rem;
+}
+
+.cotl-hero__premise {
+  max-width: 62ch;
+  margin: 0 auto 2rem;
+  color: var(--cotl-muted);
+  font-size: 1.2rem;
+}
+
+.cotl-hero__cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ---- Cards / grids ------------------------------------------------------- */
+
+.cotl-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.cotl-card {
+  background: linear-gradient(180deg, var(--cotl-surface), var(--cotl-bg-2));
+  border: 1px solid var(--cotl-border);
+  border-radius: var(--cotl-radius);
+  padding: 1.5rem;
+  box-shadow: var(--cotl-shadow);
+}
+
+.cotl-card h3 {
+  margin-bottom: 0.15rem;
+}
+.cotl-card__role {
+  font-family: var(--cotl-display);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cotl-ember);
+  margin: 0 0 1rem;
+}
+
+/* Character portrait + its artist credit. */
+.cotl-portrait {
+  margin: 0 0 1rem;
+}
+
+.cotl-portrait img {
+  width: 100%;
+  height: auto;
+  max-height: 440px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--cotl-border);
+  display: block;
+}
+
+.cotl-portrait__placeholder {
+  aspect-ratio: 3 / 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed var(--cotl-border);
+  background: var(--cotl-surface-2);
+  color: var(--cotl-muted);
+  font-family: var(--cotl-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+/* Artist credit shown directly beneath an image. Required for borrowed art. */
+.cotl-credit {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--cotl-faint);
+  font-style: italic;
+}
+
+/* ---- Feature list ------------------------------------------------------- */
+
+.cotl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.cotl-list li {
+  padding-left: 1.25rem;
+  position: relative;
+  color: var(--cotl-muted);
+}
+
+.cotl-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: var(--cotl-ember);
+}
+
+/* ---- Location chips ---------------------------------------------------- */
+
+.cotl-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.cotl-chip {
+  border: 1px solid var(--cotl-border);
+  background: var(--cotl-surface);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-family: var(--cotl-display);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--cotl-text);
+}
+
+/* ---- Footer ------------------------------------------------------------ */
+
+.cotl-footer {
+  border-top: 1px solid var(--cotl-border-soft);
+  background: var(--cotl-bg-2);
+  padding: 2.5rem 0;
+  margin-top: 4rem;
+}
+
+.cotl-footer__disclaimer {
+  font-size: 0.9rem;
+  color: var(--cotl-faint);
+  max-width: 70ch;
+  margin: 0 auto 1rem;
+  text-align: center;
+}
+
+.cotl-footer__meta {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--cotl-faint);
+}
+
+/* ---- Prose blocks ---------------------------------------------------- */
+
+.cotl-prose {
+  max-width: 68ch;
+}
+.cotl-prose > * + * {
+  margin-top: 1.1rem;
+}
+.cotl-prose h2 {
+  margin-top: 2.5rem;
+}
+
+/* Respect users who prefer less motion. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
