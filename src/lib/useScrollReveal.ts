@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import { useEffect, type RefObject } from "react";
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from "./gsap";
 
 // Elements inside a page that rise + fade in as they scroll into view.
@@ -54,4 +54,46 @@ export function useScrollReveal(
     },
     { scope, dependencies: [routeKey], revertOnUpdate: true },
   );
+
+  /**
+   * Failsafe. If a tab is backgrounded mid-navigation, the GSAP ticker throttles
+   * and a reveal can stall part-way — leaving content faded. So after a short
+   * wait, and whenever the tab returns to the foreground, force any element that
+   * is in (or above) the viewport but still not opaque to its final state.
+   *
+   * Kept in a plain effect and written straight to `style` (not via a GSAP
+   * tween) because the GSAP ticker is the very thing that may be stalled.
+   * Off-screen elements are left alone so they keep their normal scroll reveal.
+   */
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const root = scope.current;
+    if (!root) return;
+
+    const unstick = () => {
+      const vh = window.innerHeight || 900;
+      root.querySelectorAll<HTMLElement>(SELECTOR).forEach((el) => {
+        if (
+          el.getBoundingClientRect().top < vh &&
+          Number(getComputedStyle(el).opacity) < 0.99
+        ) {
+          gsap.killTweensOf(el);
+          el.style.removeProperty("opacity");
+          el.style.removeProperty("transform");
+          el.style.removeProperty("translate");
+        }
+      });
+    };
+
+    const timer = window.setTimeout(unstick, 2500);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") unstick();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [scope, routeKey]);
 }
