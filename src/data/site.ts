@@ -15,15 +15,8 @@ export const COTL_LOGO = "/images/logo/dragonlance-logo.png";
 export const COTL_TITLE = "Children of the Lance";
 export const COTL_TAGLINE = "Children versus Legacy";
 
-/**
- * Mandatory legal disclaimer. Kept in Portuguese in every language, on
- * purpose. Rendered in the footer on every page and again, in full, on the
- * Credits page. Do not shorten or alter the wording.
- */
-export const COTL_DISCLAIMER =
-  "Children of the Lance é uma obra de fã não oficial. Não é afiliada, " +
-  "endossada ou associada à Wizards of the Coast. Dragonlance e todas as " +
-  "propriedades relacionadas são marcas registadas da Wizards of the Coast.";
+// The legal / trademark disclaimer is translated per language — see
+// `disclaimer` in src/i18n/content.ts.
 
 /**
  * Navbar links. `key` maps to the label in src/i18n/content.ts `nav`, so the

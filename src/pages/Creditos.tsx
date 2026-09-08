@@ -1,4 +1,3 @@
-import { COTL_DISCLAIMER } from "../data/site";
 import { ALL_CHARACTERS } from "../data/characters";
 import { useCotl } from "../i18n/LocaleContext";
 import { useDocumentMeta } from "../lib/useDocumentMeta";
@@ -21,7 +20,7 @@ export function Creditos() {
         <p>{c.unofficial}</p>
 
         <h2>{c.h2Disclaimer}</h2>
-        <p>{COTL_DISCLAIMER}</p>
+        <p>{t.disclaimer}</p>
 
         <h2>{c.h2Credits}</h2>
         <p>{c.artworkNote}</p>

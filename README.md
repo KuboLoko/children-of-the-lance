@@ -51,10 +51,10 @@ src/
   components/         <- Navbar, Footer, Layout, CharacterCard, Logo, ArtCredit, LanguageSwitcher
   pages/              <- one file per page (Home, Historia, Personagens, Conflito, Ler, Creditos, NotFound)
   data/
-    site.ts           <- logo path, nav links, disclaimer, reading-link placeholder
+    site.ts           <- logo path, nav routes, reading-link placeholder
     characters.ts     <- who exists, their image + artist credit (no prose)
   i18n/
-    content.ts         <- ALL translatable text: PT / EN / ES (page prose + character roles + bios)
+    content.ts         <- ALL translatable text: PT / EN / ES (headings, prose, bios, disclaimer)
     LocaleContext.tsx  <- language state, remembered in localStorage
   lib/
     useDocumentMeta.ts <- sets <title> and meta description per page
@@ -64,14 +64,15 @@ src/
 
 ## Editing content
 
-- **Story text, character bios, button labels** — `src/i18n/content.ts`. Every
-  string has a `pt`, `en` and `es` version. Keep the three in sync; TypeScript
-  will complain if a key is missing.
+- **Everything with words** — headings, story text, character bios, button
+  labels, the legal disclaimer — `src/i18n/content.ts`. Every string has a
+  `pt`, `en` and `es` version. Keep the three in sync; TypeScript will
+  complain if a key is missing.
 - **Who appears on the Characters page, portraits, artist credits** —
   `src/data/characters.ts`.
-- **Nav links, the disclaimer, the logo path, the reading link** —
-  `src/data/site.ts`. To make the "Read the Story" button live, set
-  `COTL_READ_URL` to your AO3 / Wattpad link.
+- **Logo path, nav routes, the reading link** — `src/data/site.ts`. To make
+  the "Read the Story" button live, set `COTL_READ_URL` to your AO3 / Wattpad
+  link.
 - **Colours and fonts** — the CSS variables at the top of `src/styles/global.css`.
 
 ## Images

@@ -2,13 +2,12 @@
  * All translatable text for the site: PT-PT (default), EN and ES.
  *
  * Covers navbar labels, page eyebrows and headings, body prose, button
- * labels, and character role lines + bios. Add a language by adding a full
- * object below and listing it in COTL_LOCALES + COTL_CONTENT.
+ * labels, the legal disclaimer, and character role lines + bios. Add a
+ * language by adding a full object below and listing it in COTL_LOCALES +
+ * COTL_CONTENT.
  *
- * Two things stay fixed in every language, on purpose:
- *  - the work title "Children of the Lance" and the tagline
- *    "Children versus Legacy" (see data/site.ts)
- *  - the legal disclaimer COTL_DISCLAIMER (Portuguese, see data/site.ts)
+ * Only the work title "Children of the Lance" and the tagline
+ * "Children versus Legacy" stay fixed in every language (see data/site.ts).
  */
 
 export type CotlLocale = "pt" | "en" | "es";
@@ -34,8 +33,10 @@ export type CotlCopy = {
   };
   /** Mobile menu toggle button. */
   menu: { open: string; close: string };
-  /** Footer meta line (the mandatory disclaimer above it stays Portuguese). */
+  /** Footer meta line (shown under the disclaimer). */
   footer: { tag: string };
+  /** Mandatory legal / trademark disclaimer. Footer on every page + Credits. */
+  disclaimer: string;
   hero: { hook: string; ctaRead: string; ctaAbout: string };
   personagens: {
     eyebrow: string;
@@ -119,6 +120,10 @@ const pt: CotlCopy = {
   },
   menu: { open: "Menu", close: "Fechar" },
   footer: { tag: "Um projeto de fã" },
+  disclaimer:
+    "Children of the Lance é uma obra de fã não oficial. Não é afiliada, " +
+    "endossada ou associada à Wizards of the Coast. Dragonlance e todas as " +
+    "propriedades relacionadas são marcas registadas da Wizards of the Coast.",
   hero: {
     hook:
       "Trinta anos depois de os Heróis da Lança terem banido Takhisis, o " +
@@ -398,6 +403,10 @@ const en: CotlCopy = {
   },
   menu: { open: "Menu", close: "Close" },
   footer: { tag: "A fan project" },
+  disclaimer:
+    "Children of the Lance is an unofficial fan work. It is not affiliated " +
+    "with, endorsed by, or associated with Wizards of the Coast. Dragonlance " +
+    "and all related properties are trademarks of Wizards of the Coast.",
   hero: {
     hook:
       "Thirty years after the Heroes of the Lance banished Takhisis, the Dragon " +
@@ -671,6 +680,10 @@ const es: CotlCopy = {
   },
   menu: { open: "Menú", close: "Cerrar" },
   footer: { tag: "Un proyecto de aficionados" },
+  disclaimer:
+    "Children of the Lance es una obra de fans no oficial. No está afiliada, " +
+    "respaldada ni asociada a Wizards of the Coast. Dragonlance y todas las " +
+    "propiedades relacionadas son marcas registradas de Wizards of the Coast.",
   hero: {
     hook:
       "Treinta años después de que los Héroes de la Lanza desterraran a " +
