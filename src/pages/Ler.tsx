@@ -3,9 +3,14 @@ import { useCotl } from "../i18n/LocaleContext";
 import { useDocumentMeta } from "../lib/useDocumentMeta";
 
 export function Ler() {
-  const { t } = useCotl();
+  const { t, locale } = useCotl();
   const c = t.ler;
-  useDocumentMeta(`${c.h1} · Children of the Lance`, c.lead);
+  useDocumentMeta({
+    title: `${c.h1} · Children of the Lance`,
+    description: c.lead,
+    path: "/ler",
+    locale,
+  });
 
   const hasLink = Boolean(COTL_READ_URL);
 

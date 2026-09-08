@@ -3,9 +3,15 @@ import { useCotl } from "../i18n/LocaleContext";
 import { useDocumentMeta } from "../lib/useDocumentMeta";
 
 export function NotFound() {
-  const { t } = useCotl();
+  const { t, locale } = useCotl();
   const c = t.notFound;
-  useDocumentMeta(`404 · Children of the Lance`);
+  useDocumentMeta({
+    title: `404 · Children of the Lance`,
+    description: c.lead,
+    path: "/",
+    locale,
+    robots: "noindex",
+  });
 
   return (
     <div

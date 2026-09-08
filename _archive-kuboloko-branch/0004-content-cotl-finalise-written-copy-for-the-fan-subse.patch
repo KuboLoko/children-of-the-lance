@@ -1,0 +1,420 @@
+From 13e032290abcf0b22defd766ec82ffbe51face63 Mon Sep 17 00:00:00 2001
+From: Miguel <kuboloko.info@gmail.com>
+Date: Mon, 7 Sep 2026 22:48:02 +0100
+Subject: [PATCH 4/5] content(cotl): finalise written copy for the fan
+ subsection
+
+Replaces the placeholder prose with final story copy. Image paths and
+the .cotl styling are untouched.
+
+- characters.ts: full 3-4 sentence bios for Palin Majere, Karst Uth
+  Matar, Gryff, Ariakan Ariakas, and Lord Soth (accurate Knight of the
+  Black Rose lore); a deliberately vague 2-3 sentence bio for Zorath
+- site.ts: legal disclaimer switched to the site's Portuguese wording;
+  hero hook trimmed to two sentences
+- historia.tsx: backstory (gods' return, the Dragonarmy war, Takhisis
+  cast into the Abyss) then the present-day premise; Krynn / Ansalon /
+  Dragonlance named explicitly
+- conflito.tsx: the search for the Silver Child, the Eight Knights, a
+  "Children versus Legacy" theme section, and the four key locations
+  noted as changed since the original Chronicles trilogy
+- creditos.tsx: standing note that official artwork is credited beside
+  each image
+- personagens.tsx: reader-facing intro line instead of the editor note
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+---
+ src/children-of-the-lance/data/characters.ts  | 104 ++++++++++--------
+ src/children-of-the-lance/data/site.ts        |  22 ++--
+ .../children-of-the-lance/conflito.tsx        |  42 ++++---
+ .../children-of-the-lance/creditos.tsx        |   4 +
+ .../children-of-the-lance/historia.tsx        |  52 ++++-----
+ .../children-of-the-lance/personagens.tsx     |   3 +-
+ 6 files changed, 125 insertions(+), 102 deletions(-)
+
+diff --git a/src/children-of-the-lance/data/characters.ts b/src/children-of-the-lance/data/characters.ts
+index efe8c95..2f67d17 100644
+--- a/src/children-of-the-lance/data/characters.ts
++++ b/src/children-of-the-lance/data/characters.ts
+@@ -28,12 +28,10 @@ export type Character = {
+   image: string | null;
+   /** Artist credit for official/borrowed artwork, or null. */
+   artist: string | null;
+-  /** 1-3 short paragraphs. Placeholder copy — edit freely. */
++  /** One or more short paragraphs. */
+   bio: string[];
+ };
+ 
+-const CHARACTERS_DIR = "/projetos/children-of-the-lance/characters";
+-
+ export const HEROES: Character[] = [
+   {
+     id: "palin-majere",
+@@ -43,30 +41,34 @@ export const HEROES: Character[] = [
+     image: null,
+     artist: null,
+     bio: [
+-      "Palin carries the Majere name and the weight that comes with it. Where his " +
+-        "uncle Raistlin chased power, Palin studies magic as a craft in service of " +
+-        "others, and the White Robes trust him more for it.",
+-      "He is the one who refuses to wait for a prophecy to save Ansalon. Across the " +
+-        "continent he is gathering the Children of the Lance, convinced that the old " +
+-        "heroes' road can be walked again if their heirs walk it together.",
+-      "Placeholder bio — replace with your own text.",
++      "Palin Majere is the heart of the Children of the Lance and the one who " +
++        "calls them together. A mage of the White Robes, he has spent his life in " +
++        "the long shadow of his family, the steadfast Caramon and the terrible " +
++        "Raistlin, and he has learned from both that power without purpose " +
++        "devours the one who wields it.",
++      "While others wait for a prophecy to name a saviour, Palin rides from " +
++        "Solace to Palanthas gathering the heirs of the old heroes, arguing that " +
++        "legacy is not a script to be performed but a choice to be made. If " +
++        "Ansalon is saved a second time, he believes, it will be because its " +
++        "children chose to save it.",
+     ],
+   },
+   {
+     id: "karst-uth-matar",
+     name: "Karst Uth Matar",
+-    role: "Deserter of the Dragon Empire · Secret son of Kitiara",
++    role: "Deserter of the Dragon Empire · Secret Son of Kitiara",
+     side: "hero",
+     image: null,
+     artist: null,
+     bio: [
+-      "Raised inside the Dragon Empire, Karst was a soldier before he knew what he " +
+-        "was fighting for. He does not advertise whose son he is; the Uth Matar name " +
+-        "opens the wrong doors.",
+-      "He walked away from the Empire with its plans in his head and a price on his " +
+-        "back. Whether that makes him an ally or a liability is a question the other " +
+-        "Children keep asking.",
+-      "Placeholder bio — replace with your own text.",
++      "Karst Uth Matar was raised a soldier of the Dragon Empire, taught its " +
++        "cadences and its cruelties before he was old enough to question them. " +
++        "Only later did he learn whose blood he carried: Kitiara uth Matar, whose " +
++        "ambition and betrayal still echo through every war story told on Krynn.",
++      "He deserted with the Empire's plans in his head and its mark on his back, " +
++        "and now he fights the machine that made him, hoping a life spent tearing " +
++        "it down might weigh against the name he was given. The other Children do " +
++        "not know whether to trust him. Neither, most days, does he.",
+     ],
+   },
+   {
+@@ -77,13 +79,14 @@ export const HEROES: Character[] = [
+     image: null,
+     artist: null,
+     bio: [
+-      "A minotaur with a snapped horn is a minotaur with something to prove. Gryff " +
+-        "left the Blood Sea islands to earn a name that his own people would say out " +
+-        "loud without flinching.",
+-      "He is younger than the fight needs him to be, quick to anger and quicker to " +
+-        "stand between a friend and a blade. The other Children have learned not to " +
+-        "mistake his temper for a lack of honour.",
+-      "Placeholder bio — replace with your own text.",
++      "Gryff is a young minotaur who carries his shame on his face: a horn " +
++        "snapped clean, in a people who read a broken horn as a warrior left " +
++        "unfinished. The wider world takes one look and expects less of him, and " +
++        "he has built his whole young life around proving that look wrong.",
++      "Among the Children of the Lance he has found something his own kind never " +
++        "offered him, companions who measure him by what he does rather than what " +
++        "he lacks. He would not say it aloud, but he has begun to fight for them " +
++        "rather than only for his name.",
+     ],
+   },
+ ];
+@@ -92,17 +95,21 @@ export const VILLAINS: Character[] = [
+   {
+     id: "ariakan-ariakas",
+     name: "Ariakan Ariakas",
+-    role: "Red Dragon Knight · Leader of the Eight",
++    role: "Red Dragon Knight · Leader of the Eight Knights of Takhisis",
+     side: "villain",
+     image: null,
+     artist: null,
+     bio: [
+-      "Son of Duulket Ariakas, the fallen Dragon Emperor, Ariakan was born to " +
+-        "finish what his father started. He leads the Eight Knights of Takhisis from " +
+-        "the back of a red dragon and expects the world to remember the name.",
+-      "He is disciplined where his father was greedy, which makes him the more " +
+-        "dangerous of the two. The Empire follows him because he wins.",
+-      "Placeholder bio — replace with your own text.",
++      "Ariakan Ariakas is the face the Dragon Empire shows the world: a Red " +
++        "Dragon Knight in gilded armour, born to command and certain of his right " +
++        "to it. His father, Duulket Ariakas, wore the crown of Dragon Emperor and " +
++        "still failed to bring the Queen of Darkness across into the mortal realm; " +
++        "the son means to succeed where the father fell short.",
++      "He leads the Eight Knights of Takhisis with cold discipline and genuine " +
++        "faith, and he does not doubt for a moment that Takhisis will reward the " +
++        "hand that opens the door for her return. To Ariakan, the Children of the " +
++        "Lance are less an enemy than an inconvenience left over from a war his " +
++        "family already lost once.",
+     ],
+   },
+   {
+@@ -113,13 +120,12 @@ export const VILLAINS: Character[] = [
+     image: null,
+     artist: null,
+     bio: [
+-      "Zorath rides among the Eight but answers questions from no one. Where the " +
+-        "other Knights command armies, Zorath moves alone, and the missions given to " +
+-        "the Purple Knight are the ones the Empire does not write down.",
+-      "Nobody outside the inner circle has seen the face beneath the violet helm. " +
+-        "The Children of the Lance only know that wherever the search for the Silver " +
+-        "Child turns strange, Zorath was there first.",
+-      "Placeholder bio — replace with your own text.",
++      "Zorath, the Purple Dragon Knight, rides among the Eight and confides in " +
++        "none of them. Where the other Knights command armies in the open, Zorath " +
++        "keeps to the edges of the story, and the orders the Purple Knight carries " +
++        "are the ones the Empire never commits to paper.",
++      "What Zorath wants, and where Zorath came from, are questions even Ariakan " +
++        "has stopped asking aloud.",
+     ],
+   },
+   {
+@@ -131,15 +137,17 @@ export const VILLAINS: Character[] = [
+     image: "/projetos/children-of-the-lance/antagonist-Lorde-Soth.jpeg",
+     artist: "PLACEHOLDER — add the artist's name here",
+     bio: [
+-      "Once a proud Knight of Solamnia, Soth fell from grace and was cursed into " +
+-        "undeath as the Cataclysm broke the world. Centuries later he endures as a " +
+-        "Death Knight: he can kill with a spoken word, he commands skeletal warriors " +
+-        "and shrieking banshees, and his touch alone is fatal.",
+-      "In Children of the Lance he returns as a legend the heroes hoped was only a " +
+-        "story. He rides with the Eight Knights of Takhisis, though it is never quite " +
+-        "clear whether Soth serves their cause or is quietly steering it toward ends " +
+-        "of his own.",
+-      "Placeholder bio — replace with your own text.",
++      "Lord Soth was once a Knight of Solamnia, and might have been remembered as " +
++        "its greatest, had he not broken his oath for the love of an elven " +
++        "priestess and let his pride turn him from the road to redemption. For " +
++        "that failure he was cursed as the Cataclysm fell, condemned to undeath in " +
++        "the ruin of his keep, his wife and unborn child dead by his own choosing.",
++      "Now he is the Knight of the Black Rose: a death knight who can kill with a " +
++        "word of power, whose touch is death, and who rides at the head of " +
++        "skeletal warriors and wailing banshees. In Children of the Lance he " +
++        "returns as a legend the heroes prayed was only a story, moving alongside " +
++        "the Eight Knights of Takhisis, and no one can say whether he serves their " +
++        "cause or is quietly bending it toward a design of his own.",
+     ],
+   },
+ ];
+diff --git a/src/children-of-the-lance/data/site.ts b/src/children-of-the-lance/data/site.ts
+index b3bbad4..e6819b8 100644
+--- a/src/children-of-the-lance/data/site.ts
++++ b/src/children-of-the-lance/data/site.ts
+@@ -18,21 +18,21 @@ export const COTL_TITLE = "Children of the Lance";
+ export const COTL_TAGLINE = "Children versus Legacy";
+ 
+ /**
+- * Mandatory legal disclaimer. Rendered in the footer on every page and again,
+- * in full, on the Credits page. Do not shorten it.
++ * Mandatory legal disclaimer, in Portuguese to match the rest of kuboloko.pt.
++ * Rendered in the footer on every page and again, in full, on the Credits
++ * page. Do not shorten or alter the wording.
+  */
+ export const COTL_DISCLAIMER =
+-  "Children of the Lance is an unofficial fan-made work. It is not affiliated " +
+-  "with, endorsed by, or connected to Wizards of the Coast. Dragonlance and all " +
+-  "related properties are trademarks of Wizards of the Coast.";
++  "Children of the Lance é uma obra de fã não oficial. Não é afiliada, " +
++  "endossada ou associada à Wizards of the Coast. Dragonlance e todas as " +
++  "propriedades relacionadas são marcas registadas da Wizards of the Coast.";
+ 
+-/** Short premise used on the Home hero. Edit freely. */
++/** Short hook for the Home hero. One or two sentences only. */
+ export const COTL_PREMISE =
+-  "Thirty years after the Heroes of the Lance turned back Takhisis, the Queen " +
+-  "of Darkness, a new shadow falls over Ansalon. The Dragon Empire and its " +
+-  "eight Dragon Knights ride to drag the Queen back into the world. The " +
+-  "children and descendants of the old heroes must find one another and stand " +
+-  "together, walking the road their parents walked.";
++  "Thirty years after the Heroes of the Lance banished Takhisis, the Dragon " +
++  "Empire and its eight Dragon Knights ride to drag the Queen of Darkness back " +
++  "into the world. The children of the old heroes must find one another and " +
++  "stand where their parents stood.";
+ 
+ /**
+  * Navigation links for the subsection navbar. Order matters.
+diff --git a/src/routes/projetos/children-of-the-lance/conflito.tsx b/src/routes/projetos/children-of-the-lance/conflito.tsx
+index 19e435b..1b4e332 100644
+--- a/src/routes/projetos/children-of-the-lance/conflito.tsx
++++ b/src/routes/projetos/children-of-the-lance/conflito.tsx
+@@ -3,7 +3,7 @@ import { cotlHead } from "@/children-of-the-lance/lib/head";
+ import { COTL_BASE } from "@/children-of-the-lance/data/site";
+ 
+ // Key locations named in the conflict. Edit freely.
+-const LOCATIONS = ["Solace", "Qualinesti", "Palanthas", "Neraka"];
++const LOCATIONS = ["Solace", "Qualinesti", "Palanthas", "The ruins of Neraka"];
+ 
+ export const Route = createFileRoute("/projetos/children-of-the-lance/conflito")({
+   head: () =>
+@@ -24,32 +24,44 @@ function ConflitoPage() {
+       <div className="cotl-prose">
+         <p className="cotl-lead">
+           Everything turns on the <strong>Silver Child</strong>, born of a dragon and a mortal. Both
+-          sides are hunting the child, and only one can be allowed to reach it first.
++          sides are hunting the child across Ansalon, and only one of them can be allowed to reach
++          it first.
+         </p>
+ 
+-        <h2>The Silver Child</h2>
++        <h2>The search for the Silver Child</h2>
+         <p>
+-          The Eight Knights of Takhisis want the Silver Child for their dark plans. The Children of
+-          the Lance have to find the child first and keep it out of the Empire's hands before it is
+-          too late. Placeholder text — add the details you want to reveal, and the ones you want to
+-          hold back.
++          The Eight Knights of Takhisis need the Silver Child for the dark work of bringing their
++          Queen home, and they will spend armies to find it. The Children of the Lance have to reach
++          the child first and keep it beyond the Empire's grasp, before the door to the Abyss is
++          forced open a second time.
+         </p>
+ 
+         <h2>The Eight Knights of Takhisis</h2>
+         <p>
+-          Eight Dragon Knights lead the Dragon Empire, each bonded to a powerful dragon. They are
+-          commanded by <strong>Ariakan Ariakas</strong>, the Red Dragon Knight and son of the former
+-          Dragon Emperor Duulket Ariakas. Among them moves the mysterious <strong>Zorath</strong>,
+-          the Purple Dragon Knight, whose orders are never written down.
++          Eight Dragon Knights lead the Dragon Empire, each bound to a powerful dragon. They answer
++          to <strong>Ariakan Ariakas</strong>, the Red Dragon Knight and son of the former Dragon
++          Emperor Duulket Ariakas. Among them moves the mysterious <strong>Zorath</strong>, the
++          Purple Dragon Knight, whose orders are never written down.
+         </p>
+         <p>
+-          Older and colder still, <strong>Lord Soth</strong>, the Knight of the Black Rose, rides
+-          with the Eight as a returning legend, allied with their cause or quietly bending it toward
+-          his own ends.
++          Older and colder than any of them, <strong>Lord Soth</strong>, the Knight of the Black
++          Rose, rides with the Eight as a returning legend, allied with their cause or quietly
++          bending it toward ends of his own.
++        </p>
++
++        <h2>Children versus Legacy</h2>
++        <p>
++          Underneath the chase, this is a story about legacy. Every one of the Children was born
++          into an inheritance: a famous name, an old prophecy, a parent's unfinished war. The
++          question the book keeps asking is whether they are bound to follow the path laid down for
++          them, or free to forge something new. <em>Children versus Legacy.</em>
+         </p>
+ 
+         <h2>Where it plays out</h2>
+-        <p>The hunt crosses Ansalon, through places the old stories made famous:</p>
++        <p>
++          The hunt crosses Ansalon through places the original Chronicles trilogy made famous, all
++          of them changed in the thirty years since:
++        </p>
+       </div>
+ 
+       <div className="cotl-chips" style={{ marginTop: "1rem" }}>
+diff --git a/src/routes/projetos/children-of-the-lance/creditos.tsx b/src/routes/projetos/children-of-the-lance/creditos.tsx
+index 8568763..654a39e 100644
+--- a/src/routes/projetos/children-of-the-lance/creditos.tsx
++++ b/src/routes/projetos/children-of-the-lance/creditos.tsx
+@@ -34,6 +34,10 @@ function CreditosPage() {
+         <p>{COTL_DISCLAIMER}</p>
+ 
+         <h2>Artwork credits</h2>
++        <p>
++          Any official Dragonlance artwork used on this site is credited to its original artist
++          directly beside the image, and again in the list below.
++        </p>
+         {credited.length > 0 ? (
+           <ul className="cotl-list">
+             {credited.map((c) => (
+diff --git a/src/routes/projetos/children-of-the-lance/historia.tsx b/src/routes/projetos/children-of-the-lance/historia.tsx
+index 3cac10b..363c5e9 100644
+--- a/src/routes/projetos/children-of-the-lance/historia.tsx
++++ b/src/routes/projetos/children-of-the-lance/historia.tsx
+@@ -21,48 +21,48 @@ function HistoriaPage() {
+       <div className="cotl-prose">
+         <p className="cotl-lead">
+           <strong>Children of the Lance</strong> is an unofficial fan continuation of the
+-          Dragonlance Chronicles trilogy (1984), set on the world of Krynn. Its three-word summary:{" "}
++          Dragonlance Chronicles trilogy (1984). It unfolds on the world of Krynn, on the continent
++          of Ansalon, within the Dragonlance universe. Its three-word summary:{" "}
+           <em>Children versus Legacy</em>.
+         </p>
+ 
+-        <h2>The premise</h2>
++        <h2>What happened before</h2>
+         <p>
+-          Thirty years after the Heroes of the Lance stopped Takhisis, the Queen of Darkness, a new
+-          threat rises: the Dragon Empire, led by eight Dragon Knights riding powerful dragons,
+-          working to bring the Queen of Darkness back into the world.
++          Before Children of the Lance, Krynn was a world without hope. The gods had turned their
++          faces away, and the Dragonarmies of the Queen of Darkness marched unopposed across the
++          free nations of Ansalon.
+         </p>
+         <p>
+-          The children and descendants of the original Heroes of the Lance must find one another and
+-          unite to fight this new threat, walking in their parents' footsteps. The story pulls at a
+-          single question: do you follow the prophecy you were born into, or forge a new path of
+-          your own?
++          Then the gods returned, and with them a handful of unlikely companions. The Heroes of the
++          Lance travelled the length of Ansalon fighting the Dragonarmies, drawing shattered orders
++          back together and calling the good dragons home to the war. Their road ended when Takhisis
++          was stopped at the threshold of the mortal world and cast back down into the Abyss.
+         </p>
+ 
+-        <h2>The world: Krynn and Ansalon</h2>
++        <h2>The premise</h2>
+         <p>
+-          The story takes place on Krynn, on the continent of Ansalon. It is a world of gods and
+-          dragons, where Takhisis and Paladine sit on opposite sides of every conflict, and where
+-          kender, minotaurs, elves, humans, dwarves and gnomes all share the same crowded map.
++          Thirty years of that hard-won peace have passed. Now the Dragon Empire rises in its place,
++          and its eight Dragon Knights, each bound to a powerful dragon, ride with a single purpose:
++          to tear open the door the old heroes closed and bring Takhisis back into the world.
+         </p>
+         <p>
+-          Familiar places return, changed by thirty years: the town of Solace, the elven realm of
+-          Qualinesti, the great city of Palanthas, and the ruins of Neraka. Classic Dungeons &amp;
+-          Dragons classes fill its ranks too, from wizards and sorcerers to fighters.
++          The children and descendants of the original Heroes of the Lance are scattered across
++          Ansalon, most of them strangers to one another. To have any hope of stopping the Empire,
++          they must first find one another, and then decide whether to walk the road their parents
++          walked or cut a new one of their own.
+         </p>
+ 
+-        <h2>What happened before</h2>
+-        <p>
+-          Before Children of the Lance, Krynn was without hope until the gods returned. The Heroes
+-          of the Lance travelled across Ansalon fighting the Dragonarmies, uniting shattered orders
+-          and helping the good dragons return to the fight.
+-        </p>
++        <h2>The world: Krynn and Ansalon</h2>
+         <p>
+-          That story ended when Takhisis was prevented from crossing into the mortal realm and was
+-          banished back into the Abyss. The peace that followed is the peace this fanfiction puts
+-          back under threat.
++          Krynn is a world of gods and dragons, where Takhisis and Paladine stand on opposite sides
++          of every war, and where kender, minotaurs, elves, humans, dwarves and gnomes all crowd the
++          same map. Classic Dungeons &amp; Dragons callings fill its ranks, from wizards and
++          sorcerers to fighters.
+         </p>
+         <p>
+-          <em>Placeholder text — expand or rewrite any section above with your own wording.</em>
++          Familiar places return, all of them changed by thirty years: the town of Solace, the elven
++          realm of Qualinesti, the great city of Palanthas, and the ruins of Neraka where the last
++          war was lost and won.
+         </p>
+       </div>
+ 
+diff --git a/src/routes/projetos/children-of-the-lance/personagens.tsx b/src/routes/projetos/children-of-the-lance/personagens.tsx
+index f208b01..2c88912 100644
+--- a/src/routes/projetos/children-of-the-lance/personagens.tsx
++++ b/src/routes/projetos/children-of-the-lance/personagens.tsx
+@@ -19,8 +19,7 @@ function PersonagensPage() {
+       <p className="cotl-eyebrow">Personagens</p>
+       <h1>Characters</h1>
+       <p className="cotl-lead">
+-        Short placeholder bios you can edit in{" "}
+-        <code>src/children-of-the-lance/data/characters.ts</code>.
++        The heirs who answer Palin Majere's call, and the Knights of Takhisis who ride against them.
+       </p>
+ 
+       <h2 style={{ marginTop: "3rem" }}>The Children of the Lance</h2>
+-- 
+2.55.0.windows.3
+

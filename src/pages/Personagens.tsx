@@ -9,9 +9,14 @@ import {
 } from "../data/characters";
 
 export function Personagens() {
-  const { t } = useCotl();
+  const { t, locale } = useCotl();
   const c = t.personagens;
-  useDocumentMeta(`${c.h1} · Children of the Lance`, c.lead);
+  useDocumentMeta({
+    title: `${c.h1} · Children of the Lance`,
+    description: c.lead,
+    path: "/personagens",
+    locale,
+  });
 
   const renderGroup = (list: Character[]) =>
     list.map((ch) => (

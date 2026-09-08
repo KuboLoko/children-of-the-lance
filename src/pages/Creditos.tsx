@@ -3,9 +3,14 @@ import { useCotl } from "../i18n/LocaleContext";
 import { useDocumentMeta } from "../lib/useDocumentMeta";
 
 export function Creditos() {
-  const { t } = useCotl();
+  const { t, locale } = useCotl();
   const c = t.creditos;
-  useDocumentMeta(`${c.h1} · Children of the Lance`, c.unofficial);
+  useDocumentMeta({
+    title: `${c.h1} · Children of the Lance`,
+    description: c.unofficial,
+    path: "/creditos",
+    locale,
+  });
 
   // Only characters whose art is borrowed need a credit line here.
   const credited = ALL_CHARACTERS.filter((ch) => ch.image && ch.artist);

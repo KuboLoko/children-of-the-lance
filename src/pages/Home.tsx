@@ -12,8 +12,13 @@ import {
 import { Logo } from "../components/Logo";
 
 export function Home() {
-  const { t } = useCotl();
-  useDocumentMeta("Children of the Lance", t.hero.hook);
+  const { t, locale } = useCotl();
+  useDocumentMeta({
+    title: "Children of the Lance",
+    description: t.hero.hook,
+    path: "/",
+    locale,
+  });
 
   const heroRef = useRef<HTMLElement>(null);
 

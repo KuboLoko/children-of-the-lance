@@ -10,9 +10,14 @@ import {
 } from "../lib/gsap";
 
 export function Conflito() {
-  const { t } = useCotl();
+  const { t, locale } = useCotl();
   const c = t.conflito;
-  useDocumentMeta(`${c.h1} · Children of the Lance`, c.lead);
+  useDocumentMeta({
+    title: `${c.h1} · Children of the Lance`,
+    description: c.lead,
+    path: "/conflito",
+    locale,
+  });
 
   const locations = ["Solace", "Qualinesti", "Palanthas", c.ruinsOfNeraka];
 

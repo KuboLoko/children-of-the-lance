@@ -1,0 +1,1022 @@
+From 69b7ab05efe0f523c83ed7ae29963b74037fb320 Mon Sep 17 00:00:00 2001
+From: Miguel <kuboloko.info@gmail.com>
+Date: Mon, 7 Sep 2026 22:29:17 +0100
+Subject: [PATCH 2/5] feat(cotl): add data, scoped styles and shared components
+
+Building blocks for the Children of the Lance fan subsection, all kept
+out of src/routes/ so the router does not treat them as pages:
+
+- data/site.ts, data/characters.ts: all editable text and character
+  bios in one place, no component changes needed to update content
+- styles/cotl.css: dark epic-fantasy theme, fully scoped under .cotl
+  so it cannot affect the rest of kuboloko.pt
+- components/: CotLLayout (navbar + footer wrapper), CotLNav, CotLFooter
+  (mandatory legal disclaimer on every page), CharacterCard, ArtCredit
+  (artist credit shown beside borrowed artwork), CotLLogo (logo image
+  with a text wordmark fallback until the file is added)
+- lib/head.ts: shared head() builder, defaults every page to noindex
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+---
+ .../components/ArtCredit.tsx                  |  10 +
+ .../components/CharacterCard.tsx              |  35 ++
+ .../components/CotLFooter.tsx                 |  20 +
+ .../components/CotLLayout.tsx                 |  24 +
+ .../components/CotLLogo.tsx                   |  47 ++
+ .../components/CotLNav.tsx                    |  59 +++
+ src/children-of-the-lance/data/characters.ts  | 148 ++++++
+ src/children-of-the-lance/data/site.ts        |  55 ++
+ src/children-of-the-lance/lib/head.ts         |  33 ++
+ src/children-of-the-lance/styles/cotl.css     | 486 ++++++++++++++++++
+ 10 files changed, 917 insertions(+)
+ create mode 100644 src/children-of-the-lance/components/ArtCredit.tsx
+ create mode 100644 src/children-of-the-lance/components/CharacterCard.tsx
+ create mode 100644 src/children-of-the-lance/components/CotLFooter.tsx
+ create mode 100644 src/children-of-the-lance/components/CotLLayout.tsx
+ create mode 100644 src/children-of-the-lance/components/CotLLogo.tsx
+ create mode 100644 src/children-of-the-lance/components/CotLNav.tsx
+ create mode 100644 src/children-of-the-lance/data/characters.ts
+ create mode 100644 src/children-of-the-lance/data/site.ts
+ create mode 100644 src/children-of-the-lance/lib/head.ts
+ create mode 100644 src/children-of-the-lance/styles/cotl.css
+
+diff --git a/src/children-of-the-lance/components/ArtCredit.tsx b/src/children-of-the-lance/components/ArtCredit.tsx
+new file mode 100644
+index 0000000..f2bc468
+--- /dev/null
++++ b/src/children-of-the-lance/components/ArtCredit.tsx
+@@ -0,0 +1,10 @@
++/**
++ * Small caption placed directly beneath an image to credit its artist.
++ *
++ * Required whenever we show official Dragonlance artwork or any art we did not
++ * make ourselves. Renders nothing if no artist is given.
++ */
++export function ArtCredit({ artist }: { artist: string | null | undefined }) {
++  if (!artist) return null;
++  return <span className="cotl-credit">Artwork: {artist}</span>;
++}
+diff --git a/src/children-of-the-lance/components/CharacterCard.tsx b/src/children-of-the-lance/components/CharacterCard.tsx
+new file mode 100644
+index 0000000..599f04b
+--- /dev/null
++++ b/src/children-of-the-lance/components/CharacterCard.tsx
+@@ -0,0 +1,35 @@
++import type { Character } from "../data/characters";
++import { ArtCredit } from "./ArtCredit";
++
++/**
++ * One character card: portrait (or a placeholder), name, role, short bio, and
++ * an artist credit shown directly under the image when the art is borrowed.
++ */
++export function CharacterCard({ character }: { character: Character }) {
++  return (
++    <article className="cotl-card">
++      <figure className="cotl-portrait">
++        {character.image ? (
++          <img src={character.image} alt={`${character.name} — ${character.role}`} loading="lazy" />
++        ) : (
++          <div className="cotl-portrait__placeholder">
++            Add portrait
++            <br />
++            {character.id}.jpg
++          </div>
++        )}
++        {/* Credit sits next to the image, not only on the Credits page. */}
++        <figcaption>
++          <ArtCredit artist={character.artist} />
++        </figcaption>
++      </figure>
++
++      <h3>{character.name}</h3>
++      <p className="cotl-card__role">{character.role}</p>
++
++      {character.bio.map((paragraph, i) => (
++        <p key={i}>{paragraph}</p>
++      ))}
++    </article>
++  );
++}
+diff --git a/src/children-of-the-lance/components/CotLFooter.tsx b/src/children-of-the-lance/components/CotLFooter.tsx
+new file mode 100644
+index 0000000..11f9e56
+--- /dev/null
++++ b/src/children-of-the-lance/components/CotLFooter.tsx
+@@ -0,0 +1,20 @@
++import { COTL_BASE, COTL_DISCLAIMER } from "../data/site";
++
++/**
++ * Footer shown on every page of the subsection. The legal disclaimer here is
++ * mandatory and must stay on every page. The full version is repeated on the
++ * Credits page.
++ */
++export function CotLFooter() {
++  return (
++    <footer className="cotl-footer">
++      <div className="cotl-container">
++        <p className="cotl-footer__disclaimer">{COTL_DISCLAIMER}</p>
++        <p className="cotl-footer__meta">
++          A fan project · <a href={`${COTL_BASE}/creditos`}>Credits &amp; Disclaimer</a> ·{" "}
++          <a href="/">kuboloko.pt</a>
++        </p>
++      </div>
++    </footer>
++  );
++}
+diff --git a/src/children-of-the-lance/components/CotLLayout.tsx b/src/children-of-the-lance/components/CotLLayout.tsx
+new file mode 100644
+index 0000000..2cdba02
+--- /dev/null
++++ b/src/children-of-the-lance/components/CotLLayout.tsx
+@@ -0,0 +1,24 @@
++import type { ReactNode } from "react";
++import { CotLNav } from "./CotLNav";
++import { CotLFooter } from "./CotLFooter";
++
++// Scoped styles for the whole subsection. Everything is under `.cotl`, so this
++// import cannot affect the rest of the site.
++import "../styles/cotl.css";
++
++/**
++ * Wraps every page in the "Children of the Lance" subsection: the `.cotl`
++ * theme scope, the subsection navbar, the page content, and the footer with
++ * the mandatory disclaimer.
++ *
++ * Rendered once by src/routes/projetos/children-of-the-lance/route.tsx.
++ */
++export function CotLLayout({ children }: { children: ReactNode }) {
++  return (
++    <div className="cotl">
++      <CotLNav />
++      <main>{children}</main>
++      <CotLFooter />
++    </div>
++  );
++}
+diff --git a/src/children-of-the-lance/components/CotLLogo.tsx b/src/children-of-the-lance/components/CotLLogo.tsx
+new file mode 100644
+index 0000000..6ea6ed0
+--- /dev/null
++++ b/src/children-of-the-lance/components/CotLLogo.tsx
+@@ -0,0 +1,47 @@
++import { useEffect, useRef, useState } from "react";
++import { COTL_LOGO } from "../data/site";
++
++/**
++ * Shows the official Dragonlance logo image. Until that file exists at
++ * /public/projetos/children-of-the-lance/dragonlance-logo.png, it falls back
++ * to a plain text wordmark so nothing looks broken.
++ *
++ * The `onError` handler covers the normal case; the `useEffect` check covers
++ * the server-rendered case where the 404 can happen before React attaches its
++ * listener (so `onError` never fires on the client).
++ *
++ * @param className         Applied to the <img>.
++ * @param fallbackClassName Applied to the <span> wordmark when the image is missing.
++ */
++export function CotLLogo({
++  className,
++  fallbackClassName,
++}: {
++  className?: string;
++  fallbackClassName?: string;
++}) {
++  const [failed, setFailed] = useState(false);
++  const imgRef = useRef<HTMLImageElement>(null);
++
++  useEffect(() => {
++    const img = imgRef.current;
++    // If the image finished loading but has no size, it 404'd before hydration.
++    if (img && img.complete && img.naturalWidth === 0) {
++      setFailed(true);
++    }
++  }, []);
++
++  if (failed) {
++    return <span className={fallbackClassName ?? className}>Dragonlance</span>;
++  }
++
++  return (
++    <img
++      ref={imgRef}
++      className={className}
++      src={COTL_LOGO}
++      alt="Dragonlance"
++      onError={() => setFailed(true)}
++    />
++  );
++}
+diff --git a/src/children-of-the-lance/components/CotLNav.tsx b/src/children-of-the-lance/components/CotLNav.tsx
+new file mode 100644
+index 0000000..f229e70
+--- /dev/null
++++ b/src/children-of-the-lance/components/CotLNav.tsx
+@@ -0,0 +1,59 @@
++import { useState } from "react";
++import { useRouterState } from "@tanstack/react-router";
++import { COTL_BASE, COTL_NAV, COTL_TITLE } from "../data/site";
++import { CotLLogo } from "./CotLLogo";
++
++/**
++ * Sticky navbar for the subsection. Uses plain <a> links (full navigation),
++ * matching how the main kuboloko.pt chrome links between pages.
++ *
++ * The logo <img> hides itself if the file is missing, and a text wordmark
++ * shows instead — so the nav never looks broken before the asset is added.
++ */
++export function CotLNav() {
++  const [open, setOpen] = useState(false);
++  const pathname = useRouterState({ select: (s) => s.location.pathname });
++
++  return (
++    <nav className="cotl-nav">
++      <div className="cotl-container cotl-nav__inner">
++        <a href={COTL_BASE} className="cotl-nav__brand">
++          {/* Logo image, or nothing until the file is added. */}
++          <CotLLogo className="cotl-nav__logo" fallbackClassName="cotl-nav__logo-text" />
++          <span>{COTL_TITLE}</span>
++        </a>
++
++        <button
++          type="button"
++          className="cotl-nav__toggle"
++          aria-expanded={open}
++          onClick={() => setOpen((v) => !v)}
++        >
++          {open ? "Fechar" : "Menu"}
++        </button>
++
++        <ul className={`cotl-nav__links${open ? " is-open" : ""}`}>
++          {COTL_NAV.map((item) => {
++            // Exact match for the home link, prefix match for the sub-pages.
++            const active =
++              item.to === COTL_BASE
++                ? pathname === COTL_BASE || pathname === `${COTL_BASE}/`
++                : pathname.startsWith(item.to);
++            return (
++              <li key={item.to}>
++                <a
++                  href={item.to}
++                  className={active ? "is-active" : undefined}
++                  aria-current={active ? "page" : undefined}
++                  onClick={() => setOpen(false)}
++                >
++                  {item.label}
++                </a>
++              </li>
++            );
++          })}
++        </ul>
++      </div>
++    </nav>
++  );
++}
+diff --git a/src/children-of-the-lance/data/characters.ts b/src/children-of-the-lance/data/characters.ts
+new file mode 100644
+index 0000000..efe8c95
+--- /dev/null
++++ b/src/children-of-the-lance/data/characters.ts
+@@ -0,0 +1,148 @@
++/**
++ * Character data for the "Children of the Lance" subsection.
++ *
++ * Edit names, roles, bios and image paths here. No component changes needed.
++ *
++ * IMAGES
++ * ------
++ * Put image files in: public/projetos/children-of-the-lance/characters/
++ * Then set `image` to "/projetos/children-of-the-lance/characters/<file>".
++ * If `image` is null, the card shows a styled placeholder instead.
++ *
++ * ARTIST CREDIT
++ * -------------
++ * If an image is official Dragonlance artwork (or any art you did not make),
++ * set `artist` so the credit shows directly beneath the image. Leave it null
++ * for original art or placeholders.
++ */
++
++export type Character = {
++  /** Stable id, used as the React key. */
++  id: string;
++  name: string;
++  /** Short role line shown under the name, e.g. "White Robe Mage". */
++  role: string;
++  /** "hero" or "villain" — controls which section the card appears in. */
++  side: "hero" | "villain";
++  /** Path under /public, or null for a placeholder. */
++  image: string | null;
++  /** Artist credit for official/borrowed artwork, or null. */
++  artist: string | null;
++  /** 1-3 short paragraphs. Placeholder copy — edit freely. */
++  bio: string[];
++};
++
++const CHARACTERS_DIR = "/projetos/children-of-the-lance/characters";
++
++export const HEROES: Character[] = [
++  {
++    id: "palin-majere",
++    name: "Palin Majere",
++    role: "White Robe Mage · Son of Caramon",
++    side: "hero",
++    image: null,
++    artist: null,
++    bio: [
++      "Palin carries the Majere name and the weight that comes with it. Where his " +
++        "uncle Raistlin chased power, Palin studies magic as a craft in service of " +
++        "others, and the White Robes trust him more for it.",
++      "He is the one who refuses to wait for a prophecy to save Ansalon. Across the " +
++        "continent he is gathering the Children of the Lance, convinced that the old " +
++        "heroes' road can be walked again if their heirs walk it together.",
++      "Placeholder bio — replace with your own text.",
++    ],
++  },
++  {
++    id: "karst-uth-matar",
++    name: "Karst Uth Matar",
++    role: "Deserter of the Dragon Empire · Secret son of Kitiara",
++    side: "hero",
++    image: null,
++    artist: null,
++    bio: [
++      "Raised inside the Dragon Empire, Karst was a soldier before he knew what he " +
++        "was fighting for. He does not advertise whose son he is; the Uth Matar name " +
++        "opens the wrong doors.",
++      "He walked away from the Empire with its plans in his head and a price on his " +
++        "back. Whether that makes him an ally or a liability is a question the other " +
++        "Children keep asking.",
++      "Placeholder bio — replace with your own text.",
++    ],
++  },
++  {
++    id: "gryff",
++    name: "Gryff",
++    role: "Young Minotaur · The Broken Horn",
++    side: "hero",
++    image: null,
++    artist: null,
++    bio: [
++      "A minotaur with a snapped horn is a minotaur with something to prove. Gryff " +
++        "left the Blood Sea islands to earn a name that his own people would say out " +
++        "loud without flinching.",
++      "He is younger than the fight needs him to be, quick to anger and quicker to " +
++        "stand between a friend and a blade. The other Children have learned not to " +
++        "mistake his temper for a lack of honour.",
++      "Placeholder bio — replace with your own text.",
++    ],
++  },
++];
++
++export const VILLAINS: Character[] = [
++  {
++    id: "ariakan-ariakas",
++    name: "Ariakan Ariakas",
++    role: "Red Dragon Knight · Leader of the Eight",
++    side: "villain",
++    image: null,
++    artist: null,
++    bio: [
++      "Son of Duulket Ariakas, the fallen Dragon Emperor, Ariakan was born to " +
++        "finish what his father started. He leads the Eight Knights of Takhisis from " +
++        "the back of a red dragon and expects the world to remember the name.",
++      "He is disciplined where his father was greedy, which makes him the more " +
++        "dangerous of the two. The Empire follows him because he wins.",
++      "Placeholder bio — replace with your own text.",
++    ],
++  },
++  {
++    id: "zorath",
++    name: "Zorath",
++    role: "The Purple Dragon Knight",
++    side: "villain",
++    image: null,
++    artist: null,
++    bio: [
++      "Zorath rides among the Eight but answers questions from no one. Where the " +
++        "other Knights command armies, Zorath moves alone, and the missions given to " +
++        "the Purple Knight are the ones the Empire does not write down.",
++      "Nobody outside the inner circle has seen the face beneath the violet helm. " +
++        "The Children of the Lance only know that wherever the search for the Silver " +
++        "Child turns strange, Zorath was there first.",
++      "Placeholder bio — replace with your own text.",
++    ],
++  },
++  {
++    id: "lord-soth",
++    name: "Lord Soth",
++    role: "Knight of the Black Rose · Death Knight",
++    side: "villain",
++    // Existing artwork already placed in the public folder for this subsection.
++    image: "/projetos/children-of-the-lance/antagonist-Lorde-Soth.jpeg",
++    artist: "PLACEHOLDER — add the artist's name here",
++    bio: [
++      "Once a proud Knight of Solamnia, Soth fell from grace and was cursed into " +
++        "undeath as the Cataclysm broke the world. Centuries later he endures as a " +
++        "Death Knight: he can kill with a spoken word, he commands skeletal warriors " +
++        "and shrieking banshees, and his touch alone is fatal.",
++      "In Children of the Lance he returns as a legend the heroes hoped was only a " +
++        "story. He rides with the Eight Knights of Takhisis, though it is never quite " +
++        "clear whether Soth serves their cause or is quietly steering it toward ends " +
++        "of his own.",
++      "Placeholder bio — replace with your own text.",
++    ],
++  },
++];
++
++/** Convenience: every character in one list. */
++export const ALL_CHARACTERS: Character[] = [...HEROES, ...VILLAINS];
+diff --git a/src/children-of-the-lance/data/site.ts b/src/children-of-the-lance/data/site.ts
+new file mode 100644
+index 0000000..b3bbad4
+--- /dev/null
++++ b/src/children-of-the-lance/data/site.ts
+@@ -0,0 +1,55 @@
++/**
++ * Shared text and configuration for the "Children of the Lance" fan subsection.
++ *
++ * Everything here is safe to edit without touching component code.
++ * Keep this file in sync with src/children-of-the-lance/data/characters.ts.
++ */
++
++/** Base URL path for every page in this subsection. */
++export const COTL_BASE = "/projetos/children-of-the-lance";
++
++/** Folder (inside /public) where all images for this subsection live. */
++export const COTL_ASSETS = "/projetos/children-of-the-lance";
++
++/** Official Dragonlance logo. Drop the file here with this exact name. */
++export const COTL_LOGO = `${COTL_ASSETS}/dragonlance-logo.png`;
++
++export const COTL_TITLE = "Children of the Lance";
++export const COTL_TAGLINE = "Children versus Legacy";
++
++/**
++ * Mandatory legal disclaimer. Rendered in the footer on every page and again,
++ * in full, on the Credits page. Do not shorten it.
++ */
++export const COTL_DISCLAIMER =
++  "Children of the Lance is an unofficial fan-made work. It is not affiliated " +
++  "with, endorsed by, or connected to Wizards of the Coast. Dragonlance and all " +
++  "related properties are trademarks of Wizards of the Coast.";
++
++/** Short premise used on the Home hero. Edit freely. */
++export const COTL_PREMISE =
++  "Thirty years after the Heroes of the Lance turned back Takhisis, the Queen " +
++  "of Darkness, a new shadow falls over Ansalon. The Dragon Empire and its " +
++  "eight Dragon Knights ride to drag the Queen back into the world. The " +
++  "children and descendants of the old heroes must find one another and stand " +
++  "together, walking the road their parents walked.";
++
++/**
++ * Navigation links for the subsection navbar. Order matters.
++ * `to` values are absolute paths so they work from any page.
++ */
++export const COTL_NAV: { label: string; to: string }[] = [
++  { label: "Início", to: `${COTL_BASE}` },
++  { label: "A História", to: `${COTL_BASE}/historia` },
++  { label: "Personagens", to: `${COTL_BASE}/personagens` },
++  { label: "O Conflito", to: `${COTL_BASE}/conflito` },
++  { label: "Ler a História", to: `${COTL_BASE}/ler` },
++  { label: "Créditos", to: `${COTL_BASE}/creditos` },
++];
++
++/**
++ * Placeholder for the real reading link (AO3, Wattpad, etc.).
++ * When you have the link, set COTL_READ_URL to it and the button on the
++ * "Ler a História" page becomes active automatically.
++ */
++export const COTL_READ_URL: string | null = null;
+diff --git a/src/children-of-the-lance/lib/head.ts b/src/children-of-the-lance/lib/head.ts
+new file mode 100644
+index 0000000..4b4d351
+--- /dev/null
++++ b/src/children-of-the-lance/lib/head.ts
+@@ -0,0 +1,33 @@
++import { COTL_BASE } from "../data/site";
++
++/** Canonical origin for kuboloko.pt (see src/routes/__root.tsx SITE_URL). */
++const SITE_URL = "https://kuboloko.pt";
++
++/**
++ * Builds the `head` object for a page in this subsection.
++ *
++ * Every page in "Children of the Lance" is deliberately `noindex` (it is a
++ * non-commercial fan project), but each still gets a real title and
++ * description for clarity in tabs, history and internal links.
++ *
++ * @param title       Full <title> for the page.
++ * @param description Meta description.
++ * @param path        Path after the subsection base, e.g. "/historia". Use ""
++ *                    for the home page.
++ */
++export function cotlHead(title: string, description: string, path = "") {
++  const url = `${SITE_URL}${COTL_BASE}${path}`;
++  return {
++    meta: [
++      { title },
++      { name: "description", content: description },
++      { name: "robots", content: "noindex, follow" },
++      { property: "og:type", content: "website" },
++      { property: "og:site_name", content: "Kubo Loko" },
++      { property: "og:title", content: title },
++      { property: "og:description", content: description },
++      { property: "og:url", content: url },
++    ],
++    links: [{ rel: "canonical", href: url }],
++  };
++}
+diff --git a/src/children-of-the-lance/styles/cotl.css b/src/children-of-the-lance/styles/cotl.css
+new file mode 100644
+index 0000000..92064d7
+--- /dev/null
++++ b/src/children-of-the-lance/styles/cotl.css
+@@ -0,0 +1,486 @@
++/*
++ * Scoped styles for the "Children of the Lance" fan subsection.
++ *
++ * EVERYTHING here is scoped under `.cotl`, so it cannot leak into the rest of
++ * kuboloko.pt. The subsection is always dark, on purpose, and ignores the
++ * site-wide light/dark toggle.
++ *
++ * To retheme the whole subsection, edit the CSS variables in `.cotl` below.
++ */
++
++.cotl {
++  /* Palette: deep blue / arcane purple, with dragon-ember + red accents. */
++  --cotl-bg: #0c0e1e;
++  --cotl-bg-2: #141733;
++  --cotl-surface: #1c1f42;
++  --cotl-surface-2: #262a54;
++  --cotl-border: #2c2f5c;
++  --cotl-border-soft: #23264c;
++
++  --cotl-text: #e9e8f5;
++  --cotl-muted: #a7a5c8;
++  --cotl-faint: #7d7ba3;
++
++  --cotl-primary: #8163ff; /* arcane purple */
++  --cotl-primary-deep: #4a37ac;
++  --cotl-ember: #e9a441; /* dragon gold / torchlight */
++  --cotl-red: #d1402a; /* red dragon */
++  --cotl-silver: #cdd6ea; /* the Silver Child */
++
++  --cotl-display: "Cinzel", "Space Grotesk", Georgia, serif;
++  --cotl-body: "EB Garamond", Georgia, "Times New Roman", serif;
++
++  --cotl-maxw: 1080px;
++  --cotl-radius: 10px;
++  --cotl-shadow: 0 18px 50px -20px rgba(0, 0, 0, 0.7);
++
++  background-color: var(--cotl-bg);
++  /* Subtle vignette. Scrolls with the page (no fixed layer) to avoid
++     compositor repaint glitches on long pages. */
++  background-image: radial-gradient(70% 30% at 50% 0%, rgba(129, 99, 255, 0.12), transparent 70%);
++  background-repeat: no-repeat;
++  color: var(--cotl-text);
++  font-family: var(--cotl-body);
++  font-size: 1.125rem;
++  line-height: 1.7;
++  min-height: 100vh;
++}
++
++.cotl *,
++.cotl *::before,
++.cotl *::after {
++  box-sizing: border-box;
++}
++
++/* ---- Typography ---------------------------------------------------------- */
++
++.cotl h1,
++.cotl h2,
++.cotl h3 {
++  font-family: var(--cotl-display);
++  font-weight: 700;
++  line-height: 1.15;
++  letter-spacing: 0.02em;
++  color: #fff;
++  margin: 0 0 0.5em;
++}
++
++.cotl h1 {
++  font-size: clamp(2.1rem, 6vw, 3.6rem);
++}
++.cotl h2 {
++  font-size: clamp(1.6rem, 4vw, 2.4rem);
++}
++.cotl h3 {
++  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
++}
++
++.cotl p {
++  margin: 0 0 1rem;
++}
++.cotl a {
++  color: var(--cotl-ember);
++  text-decoration: none;
++}
++.cotl a:hover {
++  text-decoration: underline;
++}
++
++.cotl-eyebrow {
++  font-family: var(--cotl-display);
++  text-transform: uppercase;
++  letter-spacing: 0.28em;
++  font-size: 0.78rem;
++  color: var(--cotl-ember);
++  margin: 0 0 1rem;
++}
++
++.cotl-lead {
++  font-size: 1.25rem;
++  color: var(--cotl-muted);
++  max-width: 60ch;
++}
++
++/* ---- Layout helpers ---------------------------------------------------- */
++
++.cotl-container {
++  width: 100%;
++  max-width: var(--cotl-maxw);
++  margin: 0 auto;
++  padding: 0 1.25rem;
++}
++
++.cotl-section {
++  padding: 4rem 0;
++}
++.cotl-section--tight {
++  padding: 2.5rem 0;
++}
++
++.cotl-divider {
++  border: 0;
++  height: 1px;
++  background: linear-gradient(90deg, transparent, var(--cotl-border), transparent);
++  margin: 3rem 0;
++}
++
++/* ---- Navbar ---------------------------------------------------------------- */
++
++.cotl-nav {
++  position: sticky;
++  top: 0;
++  z-index: 20;
++  background: rgba(9, 10, 20, 0.85);
++  backdrop-filter: blur(8px);
++  border-bottom: 1px solid var(--cotl-border-soft);
++}
++
++.cotl-nav__inner {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  gap: 1rem;
++  min-height: 64px;
++}
++
++.cotl-nav__brand {
++  display: flex;
++  align-items: center;
++  gap: 0.6rem;
++  font-family: var(--cotl-display);
++  font-weight: 700;
++  letter-spacing: 0.06em;
++  color: #fff;
++  white-space: nowrap;
++}
++
++@media (max-width: 480px) {
++  .cotl-nav__brand {
++    font-size: 0.85rem;
++    letter-spacing: 0.03em;
++  }
++}
++
++.cotl-nav__logo {
++  height: 34px;
++  width: auto;
++  display: block;
++}
++/* Before the logo file exists, just show the wordmark span, not a second label. */
++.cotl-nav__logo-text {
++  display: none;
++}
++
++.cotl-nav__links {
++  display: flex;
++  align-items: center;
++  gap: 0.35rem;
++  list-style: none;
++  margin: 0;
++  padding: 0;
++}
++
++.cotl-nav__links a {
++  display: inline-block;
++  padding: 0.5rem 0.75rem;
++  border-radius: 8px;
++  font-size: 0.95rem;
++  color: var(--cotl-muted);
++  font-family: var(--cotl-display);
++  letter-spacing: 0.03em;
++}
++
++.cotl-nav__links a:hover {
++  color: #fff;
++  background: var(--cotl-surface);
++  text-decoration: none;
++}
++.cotl-nav__links a.is-active {
++  color: #fff;
++  background: var(--cotl-primary-deep);
++}
++
++.cotl-nav__toggle {
++  display: none;
++  background: var(--cotl-surface);
++  border: 1px solid var(--cotl-border);
++  color: #fff;
++  border-radius: 8px;
++  padding: 0.5rem 0.7rem;
++  font-size: 0.95rem;
++  cursor: pointer;
++}
++
++@media (max-width: 860px) {
++  .cotl-nav__toggle {
++    display: inline-block;
++  }
++  .cotl-nav__links {
++    display: none;
++    position: absolute;
++    left: 0;
++    right: 0;
++    top: 100%;
++    flex-direction: column;
++    align-items: stretch;
++    gap: 0;
++    padding: 0.5rem 1rem 1rem;
++    background: var(--cotl-bg-2);
++    border-bottom: 1px solid var(--cotl-border);
++  }
++  .cotl-nav__links.is-open {
++    display: flex;
++  }
++  .cotl-nav__links a {
++    padding: 0.75rem 0.5rem;
++    font-size: 1rem;
++  }
++}
++
++/* ---- Buttons ------------------------------------------------------------- */
++
++.cotl-btn {
++  display: inline-block;
++  padding: 0.85rem 1.6rem;
++  border-radius: var(--cotl-radius);
++  font-family: var(--cotl-display);
++  font-weight: 700;
++  letter-spacing: 0.06em;
++  text-transform: uppercase;
++  font-size: 0.9rem;
++  cursor: pointer;
++  border: 1px solid transparent;
++  transition:
++    transform 0.12s ease,
++    box-shadow 0.12s ease;
++}
++
++.cotl-btn--primary {
++  background: linear-gradient(135deg, var(--cotl-primary), var(--cotl-primary-deep));
++  color: #fff;
++  box-shadow: 0 10px 30px -12px rgba(129, 99, 255, 0.7);
++}
++
++.cotl-btn--ghost {
++  background: transparent;
++  border-color: var(--cotl-border);
++  color: var(--cotl-text);
++}
++
++.cotl-btn:hover {
++  transform: translateY(-2px);
++  text-decoration: none;
++}
++.cotl-btn[aria-disabled="true"] {
++  opacity: 0.55;
++  cursor: not-allowed;
++  transform: none;
++  box-shadow: none;
++}
++
++/* ---- Hero ------------------------------------------------------------------ */
++
++.cotl-hero {
++  text-align: center;
++  padding: 5rem 0 4rem;
++}
++
++.cotl-hero__logo {
++  max-width: 460px;
++  width: 70%;
++  margin: 0 auto 2rem;
++  display: block;
++}
++
++.cotl-hero__logo-fallback {
++  display: block;
++  font-family: var(--cotl-display);
++  font-size: clamp(1.4rem, 4vw, 2rem);
++  font-weight: 700;
++  letter-spacing: 0.32em;
++  text-transform: uppercase;
++  color: var(--cotl-silver);
++  padding: 0.5rem 1.25rem;
++  margin: 0 auto 2rem;
++}
++
++.cotl-hero__tagline {
++  font-family: var(--cotl-display);
++  text-transform: uppercase;
++  letter-spacing: 0.32em;
++  color: var(--cotl-ember);
++  font-size: 1rem;
++  margin: 0 0 1.5rem;
++}
++
++.cotl-hero__premise {
++  max-width: 62ch;
++  margin: 0 auto 2rem;
++  color: var(--cotl-muted);
++  font-size: 1.2rem;
++}
++
++.cotl-hero__cta {
++  display: flex;
++  gap: 1rem;
++  justify-content: center;
++  flex-wrap: wrap;
++}
++
++/* ---- Cards / grids ------------------------------------------------------- */
++
++.cotl-grid {
++  display: grid;
++  gap: 1.5rem;
++  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
++}
++
++.cotl-card {
++  background: linear-gradient(180deg, var(--cotl-surface), var(--cotl-bg-2));
++  border: 1px solid var(--cotl-border);
++  border-radius: var(--cotl-radius);
++  padding: 1.5rem;
++  box-shadow: var(--cotl-shadow);
++}
++
++.cotl-card h3 {
++  margin-bottom: 0.15rem;
++}
++.cotl-card__role {
++  font-family: var(--cotl-display);
++  font-size: 0.82rem;
++  letter-spacing: 0.08em;
++  text-transform: uppercase;
++  color: var(--cotl-ember);
++  margin: 0 0 1rem;
++}
++
++/* Character portrait + its artist credit. */
++.cotl-portrait {
++  margin: 0 0 1rem;
++}
++
++.cotl-portrait img {
++  width: 100%;
++  height: auto;
++  max-height: 440px;
++  object-fit: cover;
++  border-radius: 8px;
++  border: 1px solid var(--cotl-border);
++  display: block;
++}
++
++.cotl-portrait__placeholder {
++  aspect-ratio: 3 / 2;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  justify-content: center;
++  gap: 0.35rem;
++  text-align: center;
++  padding: 1rem;
++  border-radius: 8px;
++  border: 1px dashed var(--cotl-border);
++  background: var(--cotl-surface-2);
++  color: var(--cotl-muted);
++  font-family: var(--cotl-display);
++  letter-spacing: 0.1em;
++  text-transform: uppercase;
++  font-size: 0.85rem;
++}
++
++/* Artist credit shown directly beneath an image. Required for borrowed art. */
++.cotl-credit {
++  display: block;
++  margin-top: 0.4rem;
++  font-size: 0.8rem;
++  color: var(--cotl-faint);
++  font-style: italic;
++}
++
++/* ---- Feature list ------------------------------------------------------- */
++
++.cotl-list {
++  list-style: none;
++  margin: 0;
++  padding: 0;
++  display: grid;
++  gap: 1rem;
++}
++
++.cotl-list li {
++  padding-left: 1.25rem;
++  position: relative;
++  color: var(--cotl-muted);
++}
++
++.cotl-list li::before {
++  content: "";
++  position: absolute;
++  left: 0;
++  top: 0.65em;
++  width: 8px;
++  height: 8px;
++  transform: rotate(45deg);
++  background: var(--cotl-ember);
++}
++
++/* ---- Location chips ---------------------------------------------------- */
++
++.cotl-chips {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 0.6rem;
++}
++.cotl-chip {
++  border: 1px solid var(--cotl-border);
++  background: var(--cotl-surface);
++  border-radius: 999px;
++  padding: 0.35rem 0.9rem;
++  font-family: var(--cotl-display);
++  font-size: 0.82rem;
++  letter-spacing: 0.08em;
++  color: var(--cotl-text);
++}
++
++/* ---- Footer ------------------------------------------------------------ */
++
++.cotl-footer {
++  border-top: 1px solid var(--cotl-border-soft);
++  background: var(--cotl-bg-2);
++  padding: 2.5rem 0;
++  margin-top: 4rem;
++}
++
++.cotl-footer__disclaimer {
++  font-size: 0.9rem;
++  color: var(--cotl-faint);
++  max-width: 70ch;
++  margin: 0 auto 1rem;
++  text-align: center;
++}
++
++.cotl-footer__meta {
++  text-align: center;
++  font-size: 0.85rem;
++  color: var(--cotl-faint);
++}
++
++/* ---- Prose blocks ---------------------------------------------------- */
++
++.cotl-prose {
++  max-width: 68ch;
++}
++.cotl-prose > * + * {
++  margin-top: 1.1rem;
++}
++.cotl-prose h2 {
++  margin-top: 2.5rem;
++}
++
++/* Respect users who prefer less motion. */
++@media (prefers-reduced-motion: reduce) {
++  .cotl * {
++    transition: none !important;
++  }
++}
+-- 
+2.55.0.windows.3
+

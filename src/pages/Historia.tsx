@@ -3,9 +3,14 @@ import { useCotl } from "../i18n/LocaleContext";
 import { useDocumentMeta } from "../lib/useDocumentMeta";
 
 export function Historia() {
-  const { t } = useCotl();
+  const { t, locale } = useCotl();
   const c = t.historia;
-  useDocumentMeta(`${c.h1} · Children of the Lance`, c.leadIntro);
+  useDocumentMeta({
+    title: `${c.h1} · Children of the Lance`,
+    description: c.leadIntro,
+    path: "/historia",
+    locale,
+  });
 
   return (
     <div className="cotl-container cotl-section">

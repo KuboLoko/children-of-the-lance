@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://children-of-the-lance.vercel.app/sitemap.xml
