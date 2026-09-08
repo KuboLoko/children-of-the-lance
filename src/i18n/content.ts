@@ -34,6 +34,8 @@ export type CotlCopy = {
   };
   /** Mobile menu toggle button. */
   menu: { open: string; close: string };
+  /** Footer meta line (the mandatory disclaimer above it stays Portuguese). */
+  footer: { tag: string };
   hero: { hook: string; ctaRead: string; ctaAbout: string };
   personagens: {
     eyebrow: string;
@@ -116,6 +118,7 @@ const pt: CotlCopy = {
     creditos: "Créditos",
   },
   menu: { open: "Menu", close: "Fechar" },
+  footer: { tag: "Um projeto de fã" },
   hero: {
     hook:
       "Trinta anos depois de os Heróis da Lança terem banido Takhisis, o " +
@@ -394,6 +397,7 @@ const en: CotlCopy = {
     creditos: "Credits",
   },
   menu: { open: "Menu", close: "Close" },
+  footer: { tag: "A fan project" },
   hero: {
     hook:
       "Thirty years after the Heroes of the Lance banished Takhisis, the Dragon " +
@@ -666,6 +670,7 @@ const es: CotlCopy = {
     creditos: "Créditos",
   },
   menu: { open: "Menú", close: "Cerrar" },
+  footer: { tag: "Un proyecto de aficionados" },
   hero: {
     hook:
       "Treinta años después de que los Héroes de la Lanza desterraran a " +
