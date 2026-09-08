@@ -26,3 +26,6 @@ pnpm-debug.log*
 
 # vercel
 .vercel
+
+# Local backup of the deleted kubo-loko feature branch — not for the public repo
+_archive-kuboloko-branch/
