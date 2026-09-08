@@ -389,6 +389,9 @@ a:hover {
   inset: 0;
   z-index: 60;
   pointer-events: none;
+  /* Keep canvas repaints isolated on their own layer so they never
+     invalidate the rest of the page. */
+  contain: layout style paint;
 }
 
 /* ---- Hero ------------------------------------------------------------------ */

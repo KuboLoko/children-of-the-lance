@@ -3,14 +3,20 @@ import { useEffect, useRef } from "react";
 /**
  * Electric-lightning effects on a single full-viewport <canvas>:
  *
- *  - a jagged glowing bolt trails the mouse as it moves; holding the button
- *    down (dragging) makes the bolts bigger and forked;
- *  - clicking any `.cotl-btn` fires a radial "explosion" of bolts plus an
- *    expanding shockwave ring around that button.
+ *  - a jagged bolt trails the mouse as it moves (bigger + forked while dragging);
+ *  - clicking any `.cotl-btn` / header control fires a radial burst of bolts
+ *    plus an expanding ring around that control.
  *
- * pointer-events: none, so it never blocks clicks. The whole thing is skipped
- * when the visitor prefers reduced motion; the mouse trail is also skipped on
- * touch / coarse pointers (the click burst still works there).
+ * Performance notes:
+ *  - NO canvas shadowBlur (it's a per-shape gaussian blur — very expensive).
+ *    The glow is faked with 3 cheap layered translucent strokes.
+ *  - the rAF loop is suspended whenever nothing is on screen, so there is zero
+ *    per-frame cost while idle.
+ *  - the canvas backing store is kept at 1x device pixels.
+ *
+ * pointer-events: none, so it never blocks clicks. Skipped entirely for
+ * prefers-reduced-motion; the mouse trail is also skipped on coarse pointers
+ * (the click burst still works there).
  */
 
 type Point = { x: number; y: number };
@@ -18,10 +24,10 @@ type Bolt = { points: Point[]; life: number; decay: number; width: number };
 type Ring = { x: number; y: number; r: number; life: number; max: number };
 
 const CORE = "#eaf1ff";
+const MID = "#a9c7ff";
 const GLOW = "#8163ff";
-const HOT = "#a9c7ff";
 
-/** Jagged polyline between a and b via midpoint displacement. */
+/** Jagged polyline between a and b via 3 passes of midpoint displacement. */
 function makeBolt(
   ax: number,
   ay: number,
@@ -33,18 +39,19 @@ function makeBolt(
     { x: ax, y: ay },
     { x: bx, y: by },
   ];
-  for (let pass = 0; pass < 4; pass++) {
+  for (let pass = 0; pass < 3; pass++) {
     const next: Point[] = [];
     for (let i = 0; i < pts.length - 1; i++) {
       const p = pts[i];
       const q = pts[i + 1];
-      const mx = (p.x + q.x) / 2;
-      const my = (p.y + q.y) / 2;
       const nx = -(q.y - p.y);
       const ny = q.x - p.x;
       const len = Math.hypot(nx, ny) || 1;
-      const off = (Math.random() - 0.5) * amp * (1 - pass / 5);
-      next.push(p, { x: mx + (nx / len) * off, y: my + (ny / len) * off });
+      const off = (Math.random() - 0.5) * amp * (1 - pass / 4);
+      next.push(p, {
+        x: (p.x + q.x) / 2 + (nx / len) * off,
+        y: (p.y + q.y) / 2 + (ny / len) * off,
+      });
     }
     next.push(pts[pts.length - 1]);
     pts = next;
@@ -65,12 +72,9 @@ export function CursorLightning() {
     if (!ctx) return;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = window.innerWidth + "px";
-      canvas.style.height = window.innerHeight + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // 1x device pixels on purpose — lightning does not need retina sharpness.
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     };
     resize();
     window.addEventListener("resize", resize);
@@ -80,6 +84,7 @@ export function CursorLightning() {
     let last: Point | null = null;
     let dragging = false;
     let raf = 0;
+    let running = false;
 
     const addBolt = (
       a: Point,
@@ -94,33 +99,41 @@ export function CursorLightning() {
         decay,
         width,
       });
-      if (bolts.length > 90) bolts.splice(0, bolts.length - 90);
+      if (bolts.length > 48) bolts.splice(0, bolts.length - 48);
+    };
+
+    const ensureLoop = () => {
+      if (!running) {
+        running = true;
+        raf = requestAnimationFrame(tick);
+      }
     };
 
     const onMove = (e: PointerEvent) => {
       const p = { x: e.clientX, y: e.clientY };
       if (last) {
         const dist = Math.hypot(p.x - last.x, p.y - last.y);
-        if (dist > 3) {
+        if (dist > 4) {
           const amp = Math.min(
-            dist * (dragging ? 0.9 : 0.5),
-            dragging ? 90 : 42,
+            dist * (dragging ? 0.8 : 0.45),
+            dragging ? 80 : 38,
           );
-          addBolt(last, p, amp, dragging ? 2.4 : 1.5, dragging ? 0.06 : 0.09);
-          if (dragging || Math.random() < 0.25) {
+          addBolt(last, p, amp, dragging ? 2.2 : 1.4, dragging ? 0.11 : 0.16);
+          if (dragging && Math.random() < 0.6) {
             const mid = bolts[bolts.length - 1].points;
-            const m = mid[Math.floor(mid.length / 2)];
+            const m = mid[(mid.length / 2) | 0];
             addBolt(
               m,
               {
-                x: m.x + (Math.random() - 0.5) * 120,
-                y: m.y + (Math.random() - 0.5) * 120,
+                x: m.x + (Math.random() - 0.5) * 90,
+                y: m.y + (Math.random() - 0.5) * 90,
               },
-              dragging ? 60 : 30,
-              dragging ? 1.6 : 1,
-              0.12,
+              40,
+              1.3,
+              0.2,
             );
           }
+          ensureLoop();
         }
       }
       last = p;
@@ -128,32 +141,40 @@ export function CursorLightning() {
     const onDown = () => (dragging = true);
     const onUp = () => (dragging = false);
 
-    /** Radial explosion of bolts + a shockwave ring around a point. */
+    /** Radial burst of bolts + two shockwave rings around a point. */
     const burst = (cx: number, cy: number, radius: number) => {
-      const spokes = 16;
+      const spokes = 12;
       for (let i = 0; i < spokes; i++) {
-        const ang = (i / spokes) * Math.PI * 2 + Math.random() * 0.3;
-        const reach = radius + 50 + Math.random() * 90;
-        const sx = cx + Math.cos(ang) * radius * 0.6;
-        const sy = cy + Math.sin(ang) * radius * 0.6;
-        const ex = cx + Math.cos(ang) * reach;
-        const ey = cy + Math.sin(ang) * reach;
-        addBolt({ x: sx, y: sy }, { x: ex, y: ey }, reach * 0.35, 2, 0.07);
-        if (Math.random() < 0.5) {
+        const ang = (i / spokes) * Math.PI * 2 + Math.random() * 0.35;
+        const reach = radius + 44 + Math.random() * 80;
+        addBolt(
+          {
+            x: cx + Math.cos(ang) * radius * 0.55,
+            y: cy + Math.sin(ang) * radius * 0.55,
+          },
+          { x: cx + Math.cos(ang) * reach, y: cy + Math.sin(ang) * reach },
+          reach * 0.3,
+          1.8,
+          0.13,
+        );
+        if (Math.random() < 0.35) {
+          const ex = cx + Math.cos(ang) * reach;
+          const ey = cy + Math.sin(ang) * reach;
           addBolt(
             { x: ex, y: ey },
             {
-              x: ex + Math.cos(ang) * 40 + (Math.random() - 0.5) * 60,
-              y: ey + Math.sin(ang) * 40 + (Math.random() - 0.5) * 60,
+              x: ex + (Math.random() - 0.5) * 70,
+              y: ey + (Math.random() - 0.5) * 70,
             },
-            30,
-            1.2,
-            0.12,
+            28,
+            1,
+            0.22,
           );
         }
       }
-      rings.push({ x: cx, y: cy, r: radius * 0.5, life: 1, max: radius + 140 });
-      rings.push({ x: cx, y: cy, r: radius * 0.5, life: 1, max: radius + 70 });
+      rings.push({ x: cx, y: cy, r: radius * 0.5, life: 1, max: radius + 120 });
+      rings.push({ x: cx, y: cy, r: radius * 0.5, life: 1, max: radius + 60 });
+      ensureLoop();
     };
 
     // Page CTAs plus every clickable control in the header spark on click.
@@ -174,30 +195,29 @@ export function CursorLightning() {
     }
     window.addEventListener("click", onClick, { capture: true });
 
-    // One stroke pass along a bolt: `alpha` and `widthMul` scale with life `a`.
-    const strokePass = (
-      b: Bolt,
-      a: number,
-      color: string,
-      glow: string,
-      blur: number,
-      alpha: number,
-      widthMul: number,
-    ) => {
-      ctx.strokeStyle = color;
-      ctx.shadowColor = glow;
-      ctx.shadowBlur = blur * a;
-      ctx.globalAlpha = alpha * a;
-      ctx.lineWidth = b.width * widthMul;
+    // Cheap fake glow: 3 layered translucent strokes, NO shadowBlur.
+    const drawBolt = (b: Bolt) => {
       ctx.beginPath();
       ctx.moveTo(b.points[0].x, b.points[0].y);
       for (let i = 1; i < b.points.length; i++)
         ctx.lineTo(b.points[i].x, b.points[i].y);
+      const a = b.life;
+      ctx.strokeStyle = GLOW;
+      ctx.globalAlpha = 0.16 * a;
+      ctx.lineWidth = b.width * 5;
+      ctx.stroke();
+      ctx.strokeStyle = MID;
+      ctx.globalAlpha = 0.5 * a;
+      ctx.lineWidth = b.width * 2;
+      ctx.stroke();
+      ctx.strokeStyle = CORE;
+      ctx.globalAlpha = a;
+      ctx.lineWidth = b.width;
       ctx.stroke();
     };
 
     const tick = () => {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.globalCompositeOperation = "lighter";
@@ -205,50 +225,37 @@ export function CursorLightning() {
       for (let i = bolts.length - 1; i >= 0; i--) {
         const b = bolts[i];
         b.life -= b.decay;
-        if (b.life <= 0) {
-          bolts.splice(i, 1);
-          continue;
-        }
-        const a = b.life;
-        strokePass(b, a, GLOW, GLOW, 18, 0.35, 4); // outer glow
-        strokePass(b, a, HOT, HOT, 10, 0.6, 2); // mid
-        strokePass(b, a, CORE, HOT, 6, 1, 1); // hot core
+        if (b.life <= 0) bolts.splice(i, 1);
+        else drawBolt(b);
       }
 
       for (let i = rings.length - 1; i >= 0; i--) {
         const rg = rings[i];
-        rg.life -= 0.05;
-        rg.r += (rg.max - rg.r) * 0.18;
+        rg.life -= 0.06;
+        rg.r += (rg.max - rg.r) * 0.16;
         if (rg.life <= 0) {
           rings.splice(i, 1);
           continue;
         }
-        ctx.strokeStyle = HOT;
-        ctx.shadowColor = GLOW;
-        ctx.shadowBlur = 20 * rg.life;
-        ctx.globalAlpha = 0.5 * rg.life;
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = MID;
+        ctx.globalAlpha = 0.45 * rg.life;
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.arc(rg.x, rg.y, rg.r, 0, Math.PI * 2);
         ctx.stroke();
       }
 
-      if (last && !coarse) {
-        ctx.shadowColor = GLOW;
-        ctx.shadowBlur = 16;
-        ctx.fillStyle = CORE;
-        ctx.globalAlpha = 0.9;
-        ctx.beginPath();
-        ctx.arc(last.x, last.y, dragging ? 2.6 : 1.8, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
       ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
       ctx.globalCompositeOperation = "source-over";
-      raf = requestAnimationFrame(tick);
+
+      if (bolts.length || rings.length) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        // Nothing left to draw: clear once and stop burning frames.
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        running = false;
+      }
     };
-    raf = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(raf);
