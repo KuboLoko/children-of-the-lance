@@ -53,18 +53,51 @@ body {
 body {
   min-height: 100vh;
   background-color: var(--cotl-bg);
-  /* Subtle vignette. Scrolls with the page (no fixed layer) to avoid
-     compositor repaint glitches on long pages. */
-  background-image: radial-gradient(
-    70% 30% at 50% 0%,
-    rgba(129, 99, 255, 0.12),
-    transparent 70%
-  );
+  /* Top glow + aged-vellum mottling. Scrolls with the page (no fixed layer)
+     to avoid compositor repaint glitches on long pages. */
+  background-image:
+    radial-gradient(
+      70% 30% at 50% 0%,
+      rgba(129, 99, 255, 0.12),
+      transparent 70%
+    ),
+    radial-gradient(
+      90% 60% at 12% 8%,
+      rgba(120, 92, 52, 0.09),
+      transparent 55%
+    ),
+    radial-gradient(
+      90% 70% at 88% 22%,
+      rgba(74, 55, 172, 0.08),
+      transparent 55%
+    ),
+    radial-gradient(
+      120% 90% at 50% 100%,
+      rgba(58, 30, 20, 0.12),
+      transparent 60%
+    );
   background-repeat: no-repeat;
   color: var(--cotl-text);
   font-family: var(--cotl-body);
   font-size: 1.125rem;
   line-height: 1.7;
+}
+
+/*
+ * Parchment grain. A tileable fractal-noise SVG, desaturated, blended over the
+ * dark ground so the background reads like aged vellum rather than flat colour.
+ * Tune the single `opacity` value to taste (0 = off).
+ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 260px 260px;
 }
 
 img {
