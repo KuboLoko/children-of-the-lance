@@ -156,15 +156,14 @@ export function CursorLightning() {
       rings.push({ x: cx, y: cy, r: radius * 0.5, life: 1, max: radius + 70 });
     };
 
+    // Page CTAs plus every clickable control in the header spark on click.
+    const ZAP = ".cotl-btn, .cotl-nav a, .cotl-nav button";
     const onClick = (e: MouseEvent) => {
-      const el = (e.target as HTMLElement | null)?.closest(".cotl-btn");
+      const el = (e.target as HTMLElement | null)?.closest(ZAP);
       if (!el || el.getAttribute("aria-disabled") === "true") return;
       const r = el.getBoundingClientRect();
-      burst(
-        r.left + r.width / 2,
-        r.top + r.height / 2,
-        Math.max(r.width, r.height) / 2 + 8,
-      );
+      const radius = Math.max(Math.max(r.width, r.height) / 2 + 8, 20);
+      burst(r.left + r.width / 2, r.top + r.height / 2, radius);
     };
 
     if (!coarse) {
